@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPnPNet", "UPnPNet\UPnPNet.csproj", "{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.Console", "Presentation.Console\Presentation.Console.csproj", "{FCFFF157-0090-4A97-8533-7B13DBE48F2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPnPNet.Presentation.CMD", "UPnPNet.Presentation.CMD\UPnPNet.Presentation.CMD.csproj", "{FCFFF157-0090-4A97-8533-7B13DBE48F2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

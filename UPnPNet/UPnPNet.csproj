@@ -7,8 +7,8 @@
     <ProjectGuid>{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Core</RootNamespace>
-    <AssemblyName>Core</AssemblyName>
+    <RootNamespace>UPnPNet</RootNamespace>
+    <AssemblyName>UPnPNet</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,7 +40,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UPnPAction.cs" />
+    <Compile Include="DeviceDescriptionXmlParser.cs" />
+    <Compile Include="Discovery\UPnPDiscovery.cs" />
+    <Compile Include="Discovery\DiscoverySearchTargetAll.cs" />
+    <Compile Include="Discovery\DiscoverySearchTargetDeviceUUDI.cs" />
+    <Compile Include="Discovery\DiscoverySearchTargetRootDevices.cs" />
+    <Compile Include="HttpDescriptionLoader.cs" />
+    <Compile Include="IDescriptionLoader.cs" />
+    <Compile Include="IDeviceDescriptionXmlParser.cs" />
+    <Compile Include="IDiscoverySearchTarget.cs" />
+    <Compile Include="IServiceDescriptionXmlParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UPnPService.cs" />
+    <Compile Include="UPnPDevice.cs" />
+    <Compile Include="ServiceDescriptionXmlParser.cs" />
+    <Compile Include="UPnPServiceStateVariable.cs" />
+    <Compile Include="ServiceControl.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
