@@ -1,21 +1,27 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace UPnPNet
 {
-    public class ServiceDescriptionXmlParser : IServiceDescriptionXmlParser
+    public class UPnPServiceDescriptionXmlParser : IUPnPServiceDescriptionXmlParser
     {
-        public void ParseDescription(UPnPService service, string xmlstring)
+        public UPnPServiceDescription ParseDescription(UPnPService service, string xmlstring)
         {
+            UPnPServiceDescription description = new UPnPServiceDescription();
             XDocument xml = XDocument.Parse(xmlstring);
 
             //State variables
-            ParseStateVariables(service, xml);
-            ParseActions(service, xml);
+            description.StateVariables = ParseStateVariables(service, xml);
+            description.Actions = ParseActions(service, xml);
+
+            return description;
         }
 
-        private void ParseActions(UPnPService service, XDocument xml)
+        private IList<UPnPAction> ParseActions(UPnPService service, XDocument xml)
         {
+            IList<UPnPAction> actions = new List<UPnPAction>();
+
             foreach (XElement statevar in xml.Descendants().Where(x => x.Name.LocalName == "actionList").Elements())
             {
                 UPnPAction action = new UPnPAction();
@@ -53,12 +59,16 @@ namespace UPnPNet
                     }
                 }
 
-                service.Actions.Add(action);//TODO Should properly check if allready exists
+                actions.Add(action);
             }
+
+            return actions;
         }
 
-        private void ParseStateVariables(UPnPService service, XDocument xml)
+        private IList<UPnPServiceStateVariable> ParseStateVariables(UPnPService service, XDocument xml)
         {
+            IList<UPnPServiceStateVariable> vars = new List<UPnPServiceStateVariable>();
+
             foreach (XElement statevar in xml.Descendants().Where(x => x.Name.LocalName == "serviceStateTable").Elements())
             {
                 UPnPServiceStateVariable state = new UPnPServiceStateVariable();
@@ -89,8 +99,10 @@ namespace UPnPNet
                     }
                 }
 
-                service.StateVariables.Add(state);//TODO Should properly check if allready exists
+                vars.Add(state);
             }
+
+            return vars;
         }
     }
 }

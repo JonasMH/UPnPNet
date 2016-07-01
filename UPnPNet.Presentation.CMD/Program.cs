@@ -18,43 +18,34 @@ namespace Presentation.CMD
 
             IList<UPnPDevice> result = task.Result;
 
-            UPnPDevice upnPDevice = result.First();
+            foreach (UPnPDevice device in result)
+            {
+                Console.WriteLine(device.Location);
 
-            Console.WriteLine($"Found devices: " + result.Count);
+                UPnPDeviceDescription description = device.LoadDescription();
+                string keyValue = description.Properties.Where(x => x.Key == "roomName").Select(x => x.Value).FirstOrDefault();
 
-            Console.WriteLine(upnPDevice.UniqueServiceName);
-            Console.WriteLine(upnPDevice.UUID);
-            Console.WriteLine(upnPDevice.Location);
-            Console.WriteLine("Targets:");
+                if(!string.IsNullOrEmpty(keyValue))
+                    Console.WriteLine(keyValue);
+            }
 
-            upnPDevice.LoadDescription();
-
-            UPnPService avtransportService = upnPDevice.Services.First(x => x.Type.Contains("AVTransport"));
-
-            avtransportService.LoadDescription();
-
-
-            UPnPAction playAction = avtransportService.Actions.First(x => x.Name == "Play");
-            UPnPAction stopAction = avtransportService.Actions.First(x => x.Name == "Stop");
-            UPnPAction pauseAction = avtransportService.Actions.First(x => x.Name == "Pause");
-
-            ServiceControl control = new ServiceControl(avtransportService);
-
-            while (true)
+            /*while (true)
             {
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.A:
-                        control.SendAction(stopAction, new Dictionary<string, string>() { { "InstanceID", "0" } });
+                        control.SendAction("Stop", new Dictionary<string, string>() { { "InstanceID", "0" } });
                         break;
                     case ConsoleKey.S:
-                        control.SendAction(playAction, new Dictionary<string, string>() { { "InstanceID", "0" }, { "Speed", "1" } });
+                        control.SendAction("Play", new Dictionary<string, string>() { { "InstanceID", "0" }, { "Speed", "1" } });
                         break;
                     case ConsoleKey.D:
-                        control.SendAction(pauseAction, new Dictionary<string, string>() { { "InstanceID", "0" } });
+                        control.SendAction("Pause", new Dictionary<string, string>() { { "InstanceID", "0" } });
                         break;
                 }
-            }
+            }*/
+            Console.WriteLine("Press any key");
+            Console.ReadKey();
         }
     }
 }

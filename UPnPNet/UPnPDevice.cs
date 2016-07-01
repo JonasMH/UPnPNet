@@ -18,15 +18,14 @@ namespace UPnPNet
         public string Location { get; set; }
         public string Server { get; set; }
 
-        public IDeviceDescriptionXmlParser Parser { private get; set; } = new DeviceDescriptionXmlParser();
+        public IUPnPDeviceDescriptionXmlParser Parser { private get; set; } = new UPnPDeviceDescriptionXmlParser();
         public IDescriptionLoader DescriptionLoader { private get; set; } = new HttpDescriptionLoader();
 
-        public IList<UPnPService> Services { get; } = new List<UPnPService>();
         public IList<string> Targets { get; } = new List<string>();
 
-        public void LoadDescription()
+        public UPnPDeviceDescription LoadDescription()
         {
-            Parser.ParseDescription(this, DescriptionLoader.LoadDescription(Location));
+            return Parser.ParseDescription(this, DescriptionLoader.LoadDescription(Location));
         }
 
     }

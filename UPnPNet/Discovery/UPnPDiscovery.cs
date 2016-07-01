@@ -26,7 +26,6 @@ namespace UPnPNet.Discovery
 
         public async Task<IList<UPnPDevice>> SearchAsync()
         {
-            IList<UPnPDevice> output = new List<UPnPDevice>();
 
             //Prepare receive socket
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -46,46 +45,41 @@ namespace UPnPNet.Discovery
 
             Stopwatch watch = Stopwatch.StartNew();
 
-            Task task = Task.Factory.StartNew(() =>
+            IList<UPnPDevice> output = new List<UPnPDevice>();
+            while (watch.ElapsedMilliseconds < WaitTimeInSeconds * 2000)
             {
-                while (watch.ElapsedMilliseconds < WaitTimeInSeconds * 2000)
+                if (socket.Available <= 0)
+                    continue;
+
+                int received = socket.Receive(buffer);
+
+                IDictionary<string, string> response = ParseResponse(Encoder.GetString(buffer, 0, received));
+
+                if (!response.ContainsKey("LOCATION"))
+                    continue;
+
+                UPnPDevice device = output.FirstOrDefault(x => x.Location == response["LOCATION"]);
+
+                if (device == null)
                 {
-                    if (socket.Available <= 0)
-                        continue;
-
-                    int received = socket.Receive(buffer);
-
-                    IDictionary<string, string> response = ParseResponse(Encoder.GetString(buffer, 0, received));
-
-                    if (!response.ContainsKey("LOCATION"))
-                        return;
-
-                    UPnPDevice device = output.FirstOrDefault(x => x.Location == response["LOCATION"]);
-                    Console.WriteLine(response["LOCATION"]);
-
-                    if (device == null)
+                    device = new UPnPDevice()
                     {
-                        device = new UPnPDevice()
-                        {
-                            Location = response["LOCATION"],
-                            Server = response["SERVER"],
-                            UniqueServiceName = response["USN"]
-                        };
+                        Location = response["LOCATION"],
+                        Server = response["SERVER"],
+                        UniqueServiceName = response["USN"]
+                    };
 
 
-                        output.Add(device);
-                    }
-
-                    device.Targets.Add(response["ST"]);
-
-                    System.Threading.Thread.Sleep(10);
+                    output.Add(device);
                 }
-            });
 
-            await task;
+                device.Targets.Add(response["ST"]);
+
+                System.Threading.Thread.Sleep(10);
+            }
+
             socket.Close();
-
-            return output;   
+            return output;
         }
 
         private IDictionary<string, string> ParseResponse(string input)

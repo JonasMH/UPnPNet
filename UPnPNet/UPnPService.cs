@@ -12,16 +12,19 @@ namespace UPnPNet
         public string EventSubUrl { get; set; }
         public string ServiceDescriptionUrl { get; set; }
 
-
-        public IServiceDescriptionXmlParser Parser { private get; set; } = new ServiceDescriptionXmlParser();
+        public IUPnPServiceDescriptionXmlParser DescriptionParser { private get; set; } = new UPnPServiceDescriptionXmlParser();
         public IDescriptionLoader DescriptionLoader { private get; set; } = new HttpDescriptionLoader();
 
-        public void LoadDescription()
+        private UPnPServiceDescription _description;
+        public UPnPServiceDescription Description
         {
-            Parser.ParseDescription(this, DescriptionLoader.LoadDescription(BaseUrl + ServiceDescriptionUrl));
-        }
+            get
+            {
+                if (_description == null)
+                    _description = DescriptionParser.ParseDescription(this, DescriptionLoader.LoadDescription(BaseUrl + ServiceDescriptionUrl));
 
-        public virtual IList<UPnPAction> Actions { get; set; } = new List<UPnPAction>();
-        public virtual IList<UPnPServiceStateVariable> StateVariables { get; set; } = new List<UPnPServiceStateVariable>();
+                return _description;
+            }
+        }
     }
 }

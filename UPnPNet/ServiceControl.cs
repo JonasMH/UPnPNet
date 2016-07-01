@@ -16,7 +16,7 @@ namespace UPnPNet
             _service = service;
         }
 
-        public bool SendAction(UPnPAction action, IDictionary<string, string> arguments)
+        public bool SendAction(string action, IDictionary<string, string> arguments)
         {
             string argumentStr = arguments.Aggregate("", (current, c) => current + $"<{c.Key}>{c.Value}</{c.Key}>");
 
@@ -24,9 +24,9 @@ namespace UPnPNet
                 "<?xml version=\"1.0\"?>\r\n" +
                 "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n" +
                     "<s:Body>\r\n" +
-                        $"<u:{action.Name} xmlns:u=\"{_service.Type}\">\r\n" +
+                        $"<u:{action} xmlns:u=\"{_service.Type}\">\r\n" +
                             argumentStr +
-                        $"</u:{action.Name}>\r\n" +
+                        $"</u:{action}>\r\n" +
                     "</s:Body>\r\n" +
                 "</s:Envelope>\r\n";
 
@@ -35,7 +35,7 @@ namespace UPnPNet
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_service.BaseUrl + _service.ControlUrl);
             request.Method = "POST";
 
-            request.Headers.Add("SOAPACTION", _service.Type + "#" + action.Name);
+            request.Headers.Add("SOAPACTION", _service.Type + "#" + action);
 
             byte[] buffer = Encoding.UTF8.GetBytes(body);
 

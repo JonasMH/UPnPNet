@@ -1,17 +1,35 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace UPnPNet
 {
-    public class DeviceDescriptionXmlParser : IDeviceDescriptionXmlParser
+    public class UPnPDeviceDescriptionXmlParser : IUPnPDeviceDescriptionXmlParser
     {
-        public void ParseDescription(UPnPDevice device, string xmlstring)
+        public UPnPDeviceDescription ParseDescription(UPnPDevice device, string xmlstring)
         {
             XDocument xml = XDocument.Parse(xmlstring);
+            UPnPDeviceDescription description = new UPnPDeviceDescription();
 
-            //Services
-            foreach (XElement element in xml.Descendants().Where(x => x.Name.LocalName == "serviceList").Elements())
+            ParseServices(xml.Root, device, description.Services);
+            ParseProperties(xml.Root, device, description.Properties);
+
+            return description;
+
+        }
+
+        public void ParseProperties(XElement xml, UPnPDevice device, IDictionary<string, string> dic)
+        {
+            foreach (XElement xElement in xml.Elements().Where(x => x.Name.LocalName == "device").Elements().Where(x => !x.HasElements))
+            {
+                dic.Add(xElement.Name.LocalName, xElement.Value);
+            }
+        }
+
+        public void ParseServices(XElement xml, UPnPDevice device, IList<UPnPService> list)
+        {
+            foreach (XElement element in xml.Elements().Where(x => x.Name.LocalName == "device").Elements().Where(x => x.Name.LocalName == "serviceList"))
             {
                 UPnPService service = new UPnPService();
                 Uri baseUri = new Uri(device.Location);
@@ -40,8 +58,8 @@ namespace UPnPNet
                     }
                 }
 
-                device.Services.Add(service);//Should properly check if allready exists
+                list.Add(service);
             }
-        }
+        } 
     }
 }
