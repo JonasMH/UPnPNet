@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace UPnPNet
 {
-    public interface IDescriptionLoader
-    {
-        string LoadDescription(string url);
-    }
+	public interface IDescriptionLoader
+	{
+		Task<string> LoadDescription(string url);
+	}
 }

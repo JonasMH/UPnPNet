@@ -1,7 +1,7 @@
 ﻿namespace UPnPNet
 {
-    public interface IUPnPServiceDescriptionXmlParser
-    {
-        UPnPServiceDescription ParseDescription(UPnPService service, string xml);
-    }
+	public interface IUPnPServiceDescriptionXmlParser
+	{
+		UPnPServiceDescription ParseDescription(UPnPService service, string xml);
+	}
 }

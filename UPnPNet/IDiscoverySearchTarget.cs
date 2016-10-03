@@ -1,7 +1,7 @@
 namespace UPnPNet
 {
-    public interface IDiscoverySearchTarget
-    {
-        string Target { get; }
-    }
+	public interface IDiscoverySearchTarget
+	{
+		string Target { get; }
+	}
 }

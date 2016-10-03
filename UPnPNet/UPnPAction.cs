@@ -2,22 +2,22 @@
 
 namespace UPnPNet
 {
-    public struct ActionArgument
-    {
-        public enum ArgumentDirection
-        {
-            In,
-            Out
-        }
+	public struct ActionArgument
+	{
+		public enum ArgumentDirection
+		{
+			In,
+			Out
+		}
 
-        public string Name { get; set; }
-        public ArgumentDirection Direction { get; set; }
-        public string RelatedStateVariable { get; set; }
-    }
+		public string Name { get; set; }
+		public ArgumentDirection Direction { get; set; }
+		public string RelatedStateVariable { get; set; }
+	}
 
-    public class UPnPAction
-    {
-        public string Name { get; set; }
-        public IList<ActionArgument> Arguments { get; set; } = new List<ActionArgument>();
-    }
+	public class UPnPAction
+	{
+		public string Name { get; set; }
+		public IList<ActionArgument> Arguments { get; set; } = new List<ActionArgument>();
+	}
 }

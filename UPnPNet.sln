@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPnPNet", "UPnPNet\UPnPNet.csproj", "{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UPnPNet.Presentation.CMD", "UPnPNet.Presentation.CMD\UPnPNet.Presentation.CMD.csproj", "{FCFFF157-0090-4A97-8533-7B13DBE48F2D}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UPnPNet", "UPnPNet\UPnPNet.xproj", "{2307F29B-DB19-4A87-9D11-F615837B1317}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E3DB1C1-7CA4-4ECA-970D-4615545EA6FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FCFFF157-0090-4A97-8533-7B13DBE48F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FCFFF157-0090-4A97-8533-7B13DBE48F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FCFFF157-0090-4A97-8533-7B13DBE48F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FCFFF157-0090-4A97-8533-7B13DBE48F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2307F29B-DB19-4A87-9D11-F615837B1317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2307F29B-DB19-4A87-9D11-F615837B1317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2307F29B-DB19-4A87-9D11-F615837B1317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2307F29B-DB19-4A87-9D11-F615837B1317}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

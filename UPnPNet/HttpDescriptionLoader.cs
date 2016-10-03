@@ -1,28 +1,26 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace UPnPNet
 {
-    public class HttpDescriptionLoader : IDescriptionLoader
-    {
-        public string LoadDescription(string url)
-        {
-            HttpClient client = new HttpClient();
-            
-            string xml = string.Empty;
+	public class HttpDescriptionLoader : IDescriptionLoader
+	{
+		public async Task<string> LoadDescription(string url)
+		{
+			string xml;
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.AutomaticDecompression = DecompressionMethods.GZip;
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+			HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+			
+			using (Stream stream = response.GetResponseStream())
+			using (StreamReader reader = new StreamReader(stream))
+			{
+				xml = reader.ReadToEnd();
+			}
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                xml = reader.ReadToEnd();
-            }
-
-            return xml;
-        }
-    }
+			return xml;
+		}
+	}
 }

@@ -1,0 +1,18 @@
+﻿{
+	"version": "0.0.1-*",
+
+	"dependencies": {
+		"NETStandard.Library": "1.6.0",
+		"Microsoft.EntityFrameworkCore": "1.0.1",
+		"ApiInterface": "0.0.1-build62",
+		"Newtonsoft.Json": "9.0.1"
+	},
+
+	"frameworks": {
+		"netcoreapp1.0": {
+			"imports": "portable-net45+win8",
+			"dependencies": {
+			}
+		}
+	}
+}

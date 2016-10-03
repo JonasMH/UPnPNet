@@ -1,7 +1,7 @@
-﻿namespace UPnPNet
+﻿namespace UPnPNet.Discovery
 {
-    public class DiscoverySearchTargetRootDevices : IDiscoverySearchTarget
-    {
-        public string Target => "upnp:rootdevice";
-    }
+	public class DiscoverySearchTargetRootDevices : IDiscoverySearchTarget
+	{
+		public string Target => "upnp:rootdevice";
+	}
 }
