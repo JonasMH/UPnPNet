@@ -74,7 +74,7 @@ namespace UPnPNet.Discovery
 
 				device.Targets.Add(response["ST"]);
 
-				System.Threading.Thread.Sleep(10);
+				Task.Delay(100).Wait();
 			}
 
 			socket.Shutdown(SocketShutdown.Both);

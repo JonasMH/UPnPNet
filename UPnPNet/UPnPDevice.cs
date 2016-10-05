@@ -22,7 +22,7 @@ namespace UPnPNet
 
 		public UPnPDeviceDescription LoadDescription()
 		{
-			return Parser.ParseDescription(this, DescriptionLoader.LoadDescription(Location));
+			return Parser.ParseDescription(this, DescriptionLoader.LoadDescription(Location).Result);
 		}
 
 	}
