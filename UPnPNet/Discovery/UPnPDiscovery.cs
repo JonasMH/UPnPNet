@@ -40,7 +40,7 @@ namespace UPnPNet.Discovery
 
 			socket.SendTo(Encoder.GetBytes(request), SocketFlags.None, MulticastEndPoint);
 
-			IList<ArraySegment<byte>> buffer = new List<ArraySegment<byte>>();
+			byte[] buffer = new byte[2048 * 8];
 
 			Stopwatch watch = Stopwatch.StartNew();
 
@@ -50,9 +50,9 @@ namespace UPnPNet.Discovery
 				if (socket.Available <= 0)
 					continue;
 
-				int received = await socket.ReceiveAsync(buffer, SocketFlags.None);
+				int received = socket.Receive(buffer, SocketFlags.None);
 
-				IDictionary<string, string> response = ParseResponse(Encoder.GetString(buffer.First().Array, 0, received));
+				IDictionary<string, string> response = ParseResponse(Encoder.GetString(buffer, 0, received));
 
 				if (!response.ContainsKey("LOCATION"))
 					continue;
@@ -61,14 +61,7 @@ namespace UPnPNet.Discovery
 
 				if (device == null)
 				{
-					device = new UPnPDevice()
-					{
-						Location = response["LOCATION"],
-						Server = response["SERVER"],
-						UniqueServiceName = response["USN"]
-					};
-
-
+					device = CreateDeviceFromResponse(response);
 					output.Add(device);
 				}
 
@@ -79,6 +72,16 @@ namespace UPnPNet.Discovery
 
 			socket.Shutdown(SocketShutdown.Both);
 			return output;
+		}
+
+		private UPnPDevice CreateDeviceFromResponse(IDictionary<string, string> response)
+		{
+			return new UPnPDevice()
+			{
+				Location = response["LOCATION"],
+				Server = response["SERVER"],
+				UniqueServiceName = response["USN"]
+			};
 		}
 
 		private IDictionary<string, string> ParseResponse(string input)

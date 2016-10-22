@@ -1,14 +1,17 @@
-﻿{
+{
 	"version": "0.0.1-*",
-
-	"dependencies": {
-		"dotnet-test-nunit": "3.4.0-beta-2",
-		"Microsoft.NETCore.App": "1.0.1",
-		"NSubstitute": "2.0.0-rc",
-		"NUnit": "3.4.1"
+	"buildOptions": {
+		"emitEntryPoint": true
 	},
 
-	"testRunner": "nunit",
+	"dependencies": {
+		"NETStandard.Library": "1.6.0",
+		"UPnPNet": "0.0.1-*",
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0-*"
+		}
+	},
 
 	"frameworks": {
 		"netcoreapp1.0": {

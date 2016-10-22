@@ -6,8 +6,7 @@ namespace UPnPNet
 	// ReSharper disable once IconsistentNaming
 	public class UPnPDevice
 	{
-		public string UUID
-			=>
+		public string UUID =>
 				UniqueServiceName.Substring(5,
 					UniqueServiceName.IndexOf("::", StringComparison.Ordinal) - 5);
 
