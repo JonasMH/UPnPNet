@@ -1,4 +1,6 @@
-﻿namespace UPnPNet
+﻿using System.Collections.Generic;
+
+namespace UPnPNet
 {
 	public class UPnPService
 	{
@@ -9,20 +11,7 @@
 		public string ControlUrl { get; set; }
 		public string EventSubUrl { get; set; }
 		public string ServiceDescriptionUrl { get; set; }
-
-		public IUPnPServiceDescriptionXmlParser DescriptionParser { private get; set; } = new UPnPServiceDescriptionXmlParser();
-		public IDescriptionLoader DescriptionLoader { private get; set; } = new HttpDescriptionLoader();
-
-		private UPnPServiceDescription _description;
-		public UPnPServiceDescription Description
-		{
-			get
-			{
-				if (_description == null)
-					_description = DescriptionParser.ParseDescription(this, DescriptionLoader.LoadDescription(BaseUrl + ServiceDescriptionUrl).Result);
-
-				return _description;
-			}
-		}
+		public virtual IList<UPnPAction> Actions { get; set; } = new List<UPnPAction>();
+		public virtual IList<UPnPServiceStateVariable> StateVariables { get; set; } = new List<UPnPServiceStateVariable>();
 	}
 }

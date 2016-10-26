@@ -2,6 +2,6 @@
 {
 	public interface IUPnPServiceDescriptionXmlParser
 	{
-		UPnPServiceDescription ParseDescription(UPnPService service, string xml);
+		UPnPService ParseDescription(UPnPService service, string xml);
 	}
 }

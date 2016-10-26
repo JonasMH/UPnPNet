@@ -7,34 +7,60 @@ namespace UPnPNet
 {
 	public class UPnPDeviceDescriptionXmlParser : IUPnPDeviceDescriptionXmlParser
 	{
-		public UPnPDeviceDescription ParseDescription(UPnPDevice device, string xmlstring)
+
+		public UPnPDevice ParseDescription(UPnPDevice device, string xmlstring)
 		{
 			XDocument xml = XDocument.Parse(xmlstring);
-			UPnPDeviceDescription description = new UPnPDeviceDescription();
-
-			ParseServices(xml.Root, device, description.Services);
-			ParseProperties(xml.Root, device, description.Properties);
-
-			return description;
-
+			return ParseDescription(device, GetDeviceSubElements(xml.Root));
 		}
 
-		public void ParseProperties(XElement xml, UPnPDevice device, IDictionary<string, string> dic)
+		public UPnPDevice ParseDescription(UPnPDevice device, IEnumerable<XElement> xml)
 		{
-			foreach (XElement xElement in xml.Elements().Where(x => x.Name.LocalName == "device").Elements().Where(x => !x.HasElements))
+			Uri baseUri = new Uri(device.Location);
+			device.Services = ParseServices(xml, baseUri);
+			device.Properties = ParseProperties(xml);
+			device.SubDevices = LoadSubDevices(xml, device.Location);
+
+			return device;
+		}
+
+		public IList<UPnPDevice> LoadSubDevices(IEnumerable<XElement> xml, string location)
+		{
+			IList<UPnPDevice> devices = new List<UPnPDevice>();
+
+			foreach (XElement element in xml.Where(x => x.Name.LocalName == "deviceList").Elements())
 			{
-				dic.Add(xElement.Name.LocalName, xElement.Value);
+				UPnPDevice device = new UPnPDevice {Location = location};
+
+				device = ParseDescription(device, element.Elements());
+
+				devices.Add(device);
 			}
+
+			return devices;
 		}
 
-		public void ParseServices(XElement xml, UPnPDevice device, IList<UPnPService> list)
+		public IDictionary<string, string> ParseProperties(IEnumerable<XElement> xml)
 		{
-			foreach (XElement element in xml.Elements().Where(x => x.Name.LocalName == "device").Elements().Where(x => x.Name.LocalName == "serviceList"))
+			IDictionary<string, string> dictionary = new Dictionary<string, string>();
+
+			foreach (XElement xElement in xml.Where(x => !x.HasElements))
+			{
+				dictionary.Add(xElement.Name.LocalName, xElement.Value);
+			}
+
+			return dictionary;
+		}
+
+		public IList<UPnPService> ParseServices(IEnumerable<XElement> xml, Uri baseUri)
+		{
+			IList<UPnPService> services = new List<UPnPService>();
+
+			foreach (XElement element in xml.Where(x => x.Name.LocalName == "serviceList").Descendants())
 			{
 				UPnPService service = new UPnPService();
-				Uri baseUri = new Uri(device.Location);
 
-				service.BaseUrl = baseUri.Scheme + "//" + baseUri.Host + ":" + baseUri.Port;
+				service.BaseUrl = baseUri.Scheme + "://" + baseUri.Host + ":" + baseUri.Port;
 
 				foreach (XElement descendant in element.Descendants())
 				{
@@ -58,8 +84,19 @@ namespace UPnPNet
 					}
 				}
 
-				list.Add(service);
+				if (service.Type != null)
+				{
+					services.Add(service);
+				}
+
 			}
+
+			return services;
+		}
+
+		private static IEnumerable<XElement> GetDeviceSubElements(XElement xml)
+		{
+			return xml.Elements().Where(x => x.Name.LocalName == "device").Elements();
 		}
 	}
 }

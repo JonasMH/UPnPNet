@@ -6,19 +6,17 @@ namespace UPnPNet
 {
 	public class UPnPServiceDescriptionXmlParser : IUPnPServiceDescriptionXmlParser
 	{
-		public UPnPServiceDescription ParseDescription(UPnPService service, string xmlstring)
+		public UPnPService ParseDescription(UPnPService service, string xmlstring)
 		{
-			UPnPServiceDescription description = new UPnPServiceDescription();
 			XDocument xml = XDocument.Parse(xmlstring);
+			
+			service.StateVariables = ParseStateVariables(xml);
+			service.Actions = ParseActions(xml);
 
-			//State variables
-			description.StateVariables = ParseStateVariables(service, xml);
-			description.Actions = ParseActions(service, xml);
-
-			return description;
+			return service;
 		}
 
-		private IList<UPnPAction> ParseActions(UPnPService service, XDocument xml)
+		private IList<UPnPAction> ParseActions(XContainer xml)
 		{
 			IList<UPnPAction> actions = new List<UPnPAction>();
 
@@ -65,7 +63,7 @@ namespace UPnPNet
 			return actions;
 		}
 
-		private IList<UPnPServiceStateVariable> ParseStateVariables(UPnPService service, XDocument xml)
+		private IList<UPnPServiceStateVariable> ParseStateVariables(XContainer xml)
 		{
 			IList<UPnPServiceStateVariable> vars = new List<UPnPServiceStateVariable>();
 

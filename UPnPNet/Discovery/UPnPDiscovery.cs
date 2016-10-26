@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,56 +14,60 @@ namespace UPnPNet.Discovery
 	public class UPnPDiscovery
 	{
 		public int LocalPort { get; set; } = 2500;
-		public IPAddress LocalIpAddress { get; set; } = IPAddress.Any;
-		public int Port { get; set; } = 1900;
-		public int TimeToLive { get; set; } = 2;
-		public string Host { get; set; } = "239.255.255.250";
-		public int WaitTimeInSeconds { get; set; } = 1;
+		public int MulticastPort { get; set; } = 1900;
+		public int TimeToLive { get; set; } = 32;
+		public string MulticastAddress { get; set; } = "239.255.255.250";
+		public int WaitTimeInSeconds { get; set; } = 2;
 		public Encoding Encoder { get; set; } = new ASCIIEncoding();
 		public IDiscoverySearchTarget SearchTarget { get; set; } = new DiscoverySearchTargetAll();
+		
+		private IPEndPoint MulticastEndPoint => new IPEndPoint(IPAddress.Parse(MulticastAddress), MulticastPort);
 
-		private IPEndPoint LocalEndPoint => new IPEndPoint(LocalIpAddress, LocalPort);
-		private IPEndPoint MulticastEndPoint => new IPEndPoint(IPAddress.Parse(Host), Port);
-
-		public async Task<IList<UPnPDevice>> SearchAsync()
+		public async Task<IList<UPnPDevice>> Search()
 		{
-			//Prepare receive socket
-			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-			socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+			UdpClient client = new UdpClient();
+			client.Client.Bind(new IPEndPoint(IPAddress.Parse("192.168.5.12"), LocalPort));
+			client.JoinMulticastGroup(IPAddress.Parse(MulticastAddress), TimeToLive);
+			client.MulticastLoopback = true;
 
-			socket.Bind(LocalEndPoint);
+			string request = $"M-SEARCH * HTTP/1.1\r\nHOST: {MulticastAddress}:{MulticastPort}\r\nMAN:\"ssdp:discover\"\r\nST: {SearchTarget.Target}\r\nMX: {WaitTimeInSeconds}\r\n\r\n";
+			byte[] buffer = Encoder.GetBytes(request);
 
-			socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(MulticastEndPoint.Address, LocalIpAddress));
-			socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, TimeToLive);
-			socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
+			await client.SendAsync(buffer, buffer.Length, MulticastEndPoint);
 
-			string request = $"M-SEARCH * HTTP/1.1\r\nHOST: {Host}\r\nMAN:\"ssdp:discover\"\r\nST: {SearchTarget.Target}\r\nMX: {WaitTimeInSeconds}\r\n\r\n";
+			IList<UPnPDevice> foundDevices = new List<UPnPDevice>();
+			UPnPDeviceLoader deviceLoader = new UPnPDeviceLoader();
+			UPnPServiceLoader serviceLoader = new UPnPServiceLoader();
+			TaskFactory taskFactory = new TaskFactory(TaskCreationOptions.LongRunning, TaskContinuationOptions.None);
+			BlockingCollection<UPnPDevice> basicDevices = new BlockingCollection<UPnPDevice>();
+			BlockingCollection<UPnPDevice> loadedDevices = new BlockingCollection<UPnPDevice>();
+			BlockingCollection<UPnPDevice> loadedDevicesWithServices = new BlockingCollection<UPnPDevice>();
 
-			socket.SendTo(Encoder.GetBytes(request), SocketFlags.None, MulticastEndPoint);
-
-			byte[] buffer = new byte[2048 * 8];
+			taskFactory.StartNew(() => deviceLoader.LoadDevices(new[] { basicDevices }, loadedDevices));
+			Task serviceTask = taskFactory.StartNew(() => serviceLoader.LoadServices(new[] { loadedDevices }, loadedDevicesWithServices));
 
 			Stopwatch watch = Stopwatch.StartNew();
 
 			IList<UPnPDevice> output = new List<UPnPDevice>();
-			while (watch.ElapsedMilliseconds < WaitTimeInSeconds * 2000)
+			while (watch.ElapsedMilliseconds < WaitTimeInSeconds * 1500)
 			{
-				if (socket.Available <= 0)
+				if (client.Available <= 0)
 					continue;
+				
+				UdpReceiveResult received = await client.ReceiveAsync();
 
-				int received = socket.Receive(buffer, SocketFlags.None);
-
-				IDictionary<string, string> response = ParseResponse(Encoder.GetString(buffer, 0, received));
+				IDictionary<string, string> response = ParseResponse(Encoder.GetString(received.Buffer));
 
 				if (!response.ContainsKey("LOCATION"))
 					continue;
 
-				UPnPDevice device = output.FirstOrDefault(x => x.Location == response["LOCATION"]);
+				UPnPDevice device = foundDevices.FirstOrDefault(x => x.Location == response["LOCATION"]);
 
 				if (device == null)
 				{
 					device = CreateDeviceFromResponse(response);
-					output.Add(device);
+					foundDevices.Add(device);
+					basicDevices.Add(device);
 				}
 
 				device.Targets.Add(response["ST"]);
@@ -70,8 +75,11 @@ namespace UPnPNet.Discovery
 				Task.Delay(100).Wait();
 			}
 
-			socket.Shutdown(SocketShutdown.Both);
-			return output;
+			basicDevices.CompleteAdding();
+
+			await serviceTask;
+
+			return loadedDevicesWithServices.ToList();
 		}
 
 		private UPnPDevice CreateDeviceFromResponse(IDictionary<string, string> response)

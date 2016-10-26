@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,14 +12,14 @@ namespace UPnPNet
 			string xml;
 
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+			HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
 			
 			using (Stream stream = response.GetResponseStream())
 			using (StreamReader reader = new StreamReader(stream))
 			{
 				xml = reader.ReadToEnd();
 			}
-
+			
 			return xml;
 		}
 	}

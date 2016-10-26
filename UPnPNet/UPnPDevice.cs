@@ -9,20 +9,14 @@ namespace UPnPNet
 		public string UUID =>
 				UniqueServiceName.Substring(5,
 					UniqueServiceName.IndexOf("::", StringComparison.Ordinal) - 5);
-
+		
 		public string UniqueServiceName { get; set; }
 		public string Location { get; set; }
 		public string Server { get; set; }
-
-		public IUPnPDeviceDescriptionXmlParser Parser { private get; set; } = new UPnPDeviceDescriptionXmlParser();
-		public IDescriptionLoader DescriptionLoader { private get; set; } = new HttpDescriptionLoader();
-
 		public IList<string> Targets { get; } = new List<string>();
 
-		public UPnPDeviceDescription LoadDescription()
-		{
-			return Parser.ParseDescription(this, DescriptionLoader.LoadDescription(Location).Result);
-		}
-
+		public virtual IList<UPnPDevice> SubDevices { get; set; } = new List<UPnPDevice>();
+		public virtual IList<UPnPService> Services { get; set; } = new List<UPnPService>();
+		public virtual IDictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 	}
 }
