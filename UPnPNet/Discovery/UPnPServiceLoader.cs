@@ -21,12 +21,7 @@ namespace UPnPNet.Discovery
 					if(device == null)
 						continue;
 
-					foreach (UPnPService service in device.Services)
-					{
-						string descriptionXml = DescriptionLoader.LoadDescription(service.BaseUrl + service.ServiceDescriptionUrl).Result;
-						DescriptionParser.ParseDescription(service, descriptionXml);
-					}
-
+					LoadDeviceServices(device);
 					output.Add(device);
 				}
 			}
@@ -34,6 +29,20 @@ namespace UPnPNet.Discovery
 			{
 				Console.WriteLine("Done2");
 				output.CompleteAdding();
+			}
+		}
+
+		private void LoadDeviceServices(UPnPDevice device)
+		{
+			foreach (UPnPService service in device.Services)
+			{
+				string descriptionXml = DescriptionLoader.LoadDescription(service.BaseUrl + service.ServiceDescriptionUrl).Result;
+				DescriptionParser.ParseDescription(service, descriptionXml);
+			}
+
+			foreach (UPnPDevice deviceSubDevice in device.SubDevices)
+			{
+				LoadDeviceServices(deviceSubDevice);
 			}
 		}
 	}

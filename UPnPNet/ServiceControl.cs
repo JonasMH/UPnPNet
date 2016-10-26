@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace UPnPNet
@@ -31,15 +32,18 @@ namespace UPnPNet
 
 			HttpClient client = new HttpClient
 			{
-				BaseAddress = new Uri(_service.BaseUrl),
-				DefaultRequestHeaders =
-				{
-					{ "SOAPACTION", _service.Type + "#" + action },
-					{"Content-Type", "text/xml; charset =\"utf-8\"" }
-				}
+				BaseAddress = new Uri(_service.BaseUrl)
 			};
 
-			await client.PostAsync(_service.ControlUrl, new StringContent(body));
+			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, _service.ControlUrl);
+
+			message.Headers.Add("SOAPACTION", _service.Type + "#" + action);
+			message.Content = new StringContent(body, Encoding.UTF8, "text/xml");
+
+			HttpResponseMessage response = await client.SendAsync(message);
+			string responseContent = Encoding.UTF8.GetString(response.Content.ReadAsByteArrayAsync().Result);
+
+			Console.WriteLine(responseContent);
 
 			return true;
 		}

@@ -24,35 +24,37 @@ namespace UPnPNet
 			{
 				UPnPAction action = new UPnPAction();
 
-				foreach (XElement descendant in statevar.Elements())
+				foreach (XElement element in statevar.Elements())
 				{
-					switch (descendant.Name.LocalName)
+					switch (element.Name.LocalName)
 					{
 						case "name":
-							action.Name = descendant.Value;
+							action.Name = element.Value;
 							break;
 						case "argumentList":
-							ActionArgument arg = new ActionArgument();
-
-							foreach (XElement xElement in descendant.Descendants())
+							foreach (XElement xElement in element.Elements())
 							{
-								switch (xElement.Name.LocalName)
+								ActionArgument arg = new ActionArgument();
+								foreach (XElement xElement1 in xElement.Elements())
 								{
-									case "Name":
-										arg.Name = xElement.Value;
-										break;
-									case "direction":
-										arg.Direction = xElement.Value == "in"
-											? ActionArgument.ArgumentDirection.In
-											: ActionArgument.ArgumentDirection.Out;
-										break;
-									case "relatedStateVariable":
-										arg.RelatedStateVariable = xElement.Value;
-										break;
+									switch (xElement1.Name.LocalName)
+									{
+										case "name":
+											arg.Name = xElement1.Value;
+											break;
+										case "direction":
+											arg.Direction = xElement1.Value == "in"
+												? ActionArgument.ArgumentDirection.In
+												: ActionArgument.ArgumentDirection.Out;
+											break;
+										case "relatedStateVariable":
+											arg.RelatedStateVariable = xElement1.Value;
+											break;
+									}
 								}
+								action.Arguments.Add(arg);
 							}
 
-							action.Arguments.Add(arg);
 							break;
 					}
 				}

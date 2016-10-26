@@ -8,5 +8,10 @@ namespace UPnPNet
 		public string DataType { get; set; }
 		public bool SendEvent { get; set; }
 		public IList<string> AllowedValues { get; set; } = new List<string>();
+
+		public override string ToString()
+		{
+			return Name + " (" + DataType + ")";
+		}
 	}
 }
