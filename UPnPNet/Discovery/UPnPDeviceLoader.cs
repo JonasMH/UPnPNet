@@ -27,7 +27,6 @@ namespace UPnPNet.Discovery
 			}
 			finally
 			{
-				Console.WriteLine("Done1");
 				output.CompleteAdding();
 			}
 		}

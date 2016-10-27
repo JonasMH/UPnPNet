@@ -40,10 +40,7 @@ namespace UPnPNet
 			message.Headers.Add("SOAPACTION", _service.Type + "#" + action);
 			message.Content = new StringContent(body, Encoding.UTF8, "text/xml");
 
-			HttpResponseMessage response = await client.SendAsync(message);
-			string responseContent = Encoding.UTF8.GetString(response.Content.ReadAsByteArrayAsync().Result);
-
-			Console.WriteLine(responseContent);
+			await client.SendAsync(message);
 
 			return true;
 		}
