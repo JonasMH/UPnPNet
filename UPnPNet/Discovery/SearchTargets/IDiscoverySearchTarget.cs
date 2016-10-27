@@ -1,4 +1,4 @@
-namespace UPnPNet
+namespace UPnPNet.Discovery.SearchTargets
 {
 	public interface IDiscoverySearchTarget
 	{

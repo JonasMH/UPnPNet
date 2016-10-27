@@ -1,6 +1,6 @@
-﻿namespace UPnPNet.Discovery
+﻿namespace UPnPNet.Discovery.SearchTargets
 {
-	public class DiscoverySearchTargetDeviceUUDI : IDiscoverySearchTarget
+	internal class DiscoverySearchTargetDeviceUUDI : IDiscoverySearchTarget
 	{
 		public DiscoverySearchTargetDeviceUUDI(string deviceUUID)
 		{

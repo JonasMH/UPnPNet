@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using UPnPNet.Discovery.SearchTargets;
 
 namespace UPnPNet.Discovery
 {
@@ -43,12 +44,11 @@ namespace UPnPNet.Discovery
 			BlockingCollection<UPnPDevice> loadedDevices = new BlockingCollection<UPnPDevice>();
 			BlockingCollection<UPnPDevice> loadedDevicesWithServices = new BlockingCollection<UPnPDevice>();
 
-			taskFactory.StartNew(() => deviceLoader.LoadDevices(new[] { basicDevices }, loadedDevices));
+			Task deviceTask = taskFactory.StartNew(() => deviceLoader.LoadDevices(new[] { basicDevices }, loadedDevices));
 			Task serviceTask = taskFactory.StartNew(() => serviceLoader.LoadServices(new[] { loadedDevices }, loadedDevicesWithServices));
 
 			Stopwatch watch = Stopwatch.StartNew();
-
-			IList<UPnPDevice> output = new List<UPnPDevice>();
+			
 			while (watch.ElapsedMilliseconds < WaitTimeInSeconds * 1500)
 			{
 				if (client.Available <= 0)
@@ -77,6 +77,7 @@ namespace UPnPNet.Discovery
 
 			basicDevices.CompleteAdding();
 
+			await deviceTask;
 			await serviceTask;
 
 			return loadedDevicesWithServices.ToList();
@@ -94,7 +95,7 @@ namespace UPnPNet.Discovery
 
 		private IDictionary<string, string> ParseResponse(string input)
 		{
-			string[] lines = input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+			string[] lines = input.Split(new [] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 			Dictionary<string, string> output = new Dictionary<string, string>();
 
 			if (lines[0] != "HTTP/1.1 200 OK")

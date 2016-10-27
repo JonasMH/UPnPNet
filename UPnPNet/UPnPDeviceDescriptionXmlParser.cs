@@ -7,7 +7,6 @@ namespace UPnPNet
 {
 	public class UPnPDeviceDescriptionXmlParser : IUPnPDeviceDescriptionXmlParser
 	{
-
 		public UPnPDevice ParseDescription(UPnPDevice device, string xmlstring)
 		{
 			XDocument xml = XDocument.Parse(xmlstring);
@@ -17,9 +16,11 @@ namespace UPnPNet
 		public UPnPDevice ParseDescription(UPnPDevice device, IEnumerable<XElement> xml)
 		{
 			Uri baseUri = new Uri(device.Location);
-			device.Services = ParseServices(xml, baseUri);
-			device.Properties = ParseProperties(xml);
-			device.SubDevices = LoadSubDevices(xml, device.Location);
+			IEnumerable<XElement> xElements = xml as IList<XElement> ?? xml.ToList();
+
+			device.Services = ParseServices(xElements, baseUri);
+			device.Properties = ParseProperties(xElements);
+			device.SubDevices = LoadSubDevices(xElements, device.Location);
 
 			return device;
 		}
@@ -30,7 +31,7 @@ namespace UPnPNet
 
 			foreach (XElement element in xml.Where(x => x.Name.LocalName == "deviceList").Elements())
 			{
-				UPnPDevice device = new UPnPDevice {Location = location};
+				UPnPDevice device = new UPnPDevice { Location = location };
 
 				device = ParseDescription(device, element.Elements());
 
@@ -58,9 +59,8 @@ namespace UPnPNet
 
 			foreach (XElement element in xml.Where(x => x.Name.LocalName == "serviceList").Descendants())
 			{
-				UPnPService service = new UPnPService();
+				UPnPService service = new UPnPService {BaseUrl = baseUri.Scheme + "://" + baseUri.Host + ":" + baseUri.Port};
 
-				service.BaseUrl = baseUri.Scheme + "://" + baseUri.Host + ":" + baseUri.Port;
 
 				foreach (XElement descendant in element.Descendants())
 				{
