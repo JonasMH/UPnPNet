@@ -27,7 +27,7 @@ namespace UPnPNet.Discovery
 		public async Task<IList<UPnPDevice>> Search()
 		{
 			UdpClient client = new UdpClient();
-			client.Client.Bind(new IPEndPoint(IPAddress.Parse("192.168.5.12"), LocalPort));
+			client.Client.Bind(new IPEndPoint(IPAddress.Any, LocalPort));
 			client.JoinMulticastGroup(IPAddress.Parse(MulticastAddress), TimeToLive);
 			client.MulticastLoopback = true;
 
