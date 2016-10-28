@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace UPnPNet
 {
-	public class ServiceControl
 	{
 		private readonly UPnPService _service;
 
-		public ServiceControl(UPnPService service)
 		{
 			_service = service;
 		}

@@ -20,7 +20,7 @@ namespace UPnPNet.Presentation.Cli
 		    IList<UPnPService> avServices = sonosDevices.SelectMany(x => x.SubDevices).SelectMany(x => x.Services)
                 .Where(x => x.Type == "urn:schemas-upnp-org:service:AVTransport:1").ToList();
 
-			IList<ServiceControl> speakers = avServices.Select(x => new ServiceControl(x)).ToList();
+			IList<UPnPServiceControl> speakers = avServices.Select(x => new UPnPServiceControl(x)).ToList();
 
 
 			while (true)
