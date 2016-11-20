@@ -4,9 +4,14 @@ using System.Xml.Linq;
 
 namespace UPnPNet.Soap
 {
-	public class SoapResponseParser
+	public interface ISoapResponseParser
 	{
-		public static SoapResponse ParseResponse(string text)
+		SoapResponse ParseResponse(string text);
+	}
+
+	public class SoapResponseParser : ISoapResponseParser
+	{
+		public SoapResponse ParseResponse(string text)
 		{
 			XDocument xml = XDocument.Parse(text);
 

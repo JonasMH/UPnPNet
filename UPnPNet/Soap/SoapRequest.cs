@@ -1,36 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace UPnPNet.Soap
 {
-	public class SoapClient
-	{
-		public Uri BaseAddress { get; set; }
-
-		public async Task<SoapResponse> SendAsync(SoapRequest request)
-		{
-			HttpClient client = new HttpClient
-			{
-				BaseAddress = BaseAddress
-			};
-
-			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, request.ControlUrl);
-
-			message.Headers.Add("SOAPACTION", request.ServiceType + "#" + request.Action);
-			message.Content = new StringContent(request.GetBody(), Encoding.UTF8, "text/xml");
-
-			HttpResponseMessage response = await client.SendAsync(message);
-
-			return SoapResponseParser.ParseResponse(await response.Content.ReadAsStringAsync());
-		}
-	}
-
 	public class SoapRequest
 	{
 		public IDictionary<string, string> Arguments { get; set; } = new Dictionary<string, string>();

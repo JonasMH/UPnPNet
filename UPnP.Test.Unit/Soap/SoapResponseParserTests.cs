@@ -6,6 +6,14 @@ namespace UPnP.Test.Unit.Soap
 	[TestFixture]
 	public class SoapResponseParserTests
 	{
+		private SoapResponseParser _parser;
+
+		[SetUp]
+		public void Setup()
+		{
+			_parser = new SoapResponseParser();
+		}
+
 		[Test]
 		public void ParseResponse_IncludeOneValue_ValuePresent()
 		{
@@ -19,7 +27,7 @@ namespace UPnP.Test.Unit.Soap
 							   "</soap:Envelope>";
 
 
-			SoapResponse response = SoapResponseParser.ParseResponse(xml);
+			SoapResponse response = _parser.ParseResponse(xml);
 
 			Assert.That(response.Values, Has.Count.EqualTo(1));
 		}
