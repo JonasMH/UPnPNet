@@ -40,12 +40,11 @@ namespace UPnPNet.Soap
 
 		public string GetBody()
 		{
-			string argumentStr = Arguments.Aggregate("", (current, c) => current + $"<{c.Key}>{c.Value}</{c.Key}>");
-
 			XNamespace ns = "http://schemas.xmlsoap.org/soap/envelope/";
 			XNamespace serviceNs = ServiceType;
 
-			XElement actionElement = new XElement(serviceNs + Action, new XAttribute(XNamespace.Xmlns + "service", serviceNs), argumentStr);
+			IList<XElement> xArguments = Arguments.Select(x => new XElement(x.Key, x.Value)).ToList();
+			XElement actionElement = new XElement(serviceNs + Action, new XAttribute(XNamespace.Xmlns + "service", serviceNs), xArguments);
 			XElement bodyElement = new XElement(ns + "Body", actionElement);
 			XElement envelopeElement = new XElement(ns + "Envelope", new XAttribute(XNamespace.Xmlns + "soap", ns), bodyElement);
 

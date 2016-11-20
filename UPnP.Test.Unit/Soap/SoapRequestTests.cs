@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using NUnit.Framework;
 using UPnPNet.Soap;
 
@@ -17,7 +18,25 @@ namespace UPnP.Test.Unit.Soap
 				ControlUrl = "/SomeUrl"
 			};
 
-			Assert.That(request.GetBody(), Does.StartWith("<?xml version=\"1.0\" encoding=\"utf-8\"?>"));
+			string body = request.GetBody();
+
+			Assert.That(body, Does.StartWith("<?xml version=\"1.0\" encoding=\"utf-8\"?>"));
+		}
+
+		[Test]
+		public void GetBody_SingleArgument_ArgumentShouldBePresentInXml()
+		{
+			SoapRequest request = new SoapRequest
+			{
+				Action = "SomeAction",
+				ServiceType = "SomeServiceType",
+				ControlUrl = "/SomeUrl",
+				Arguments = new Dictionary<string, string> { { "SomeArgument", "SomeValue"} }
+			};
+
+			string body = request.GetBody();
+
+			Assert.That(body, Does.Contain("<SomeArgument>SomeValue</SomeArgument>"));
 		}
 	}
 }
