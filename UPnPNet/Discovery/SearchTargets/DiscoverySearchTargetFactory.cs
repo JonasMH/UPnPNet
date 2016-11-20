@@ -1,6 +1,6 @@
 ﻿namespace UPnPNet.Discovery.SearchTargets
 {
-	public class DiscoverySearchTargets
+	public class DiscoverySearchTargetFactory
 	{
 		public static IDiscoverySearchTarget AllSearch()
 		{

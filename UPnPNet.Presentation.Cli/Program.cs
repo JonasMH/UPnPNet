@@ -11,7 +11,7 @@ namespace UPnPNet.Presentation.Cli
 		public static void Main(string[] args)
 		{
 			Console.WriteLine("Searching...");
-			UPnPDiscovery discovery = new UPnPDiscovery { SearchTarget = DiscoverySearchTargets.ServiceTypeSearch("AVTransport", "1") };
+			UPnPDiscovery discovery = new UPnPDiscovery { SearchTarget = DiscoverySearchTargetFactory.ServiceTypeSearch("AVTransport", "1") };
 			IList<UPnPDevice> devices = discovery.Search().Result;
 			Console.WriteLine("Search done");
 			Console.WriteLine("Devices found: " + devices.Count);

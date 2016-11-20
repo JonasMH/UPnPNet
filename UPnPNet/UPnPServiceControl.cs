@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
+using UPnPNet.Soap;
 
 namespace UPnPNet
 {
@@ -16,33 +20,22 @@ namespace UPnPNet
 			_service = service;
 		}
 
-		public async Task<bool> SendAction(string action, IDictionary<string, string> arguments)
+		public async Task<IDictionary<string, string>> SendAction(string action, IDictionary<string, string> arguments)
 		{
-			string argumentStr = arguments.Aggregate("", (current, c) => current + $"<{c.Key}>{c.Value}</{c.Key}>");
-
-			string body =
-				"<?xml version=\"1.0\"?>\r\n" +
-				"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n" +
-					"<s:Body>\r\n" +
-						$"<u:{action} xmlns:u=\"{_service.Type}\">\r\n" +
-							argumentStr +
-						$"</u:{action}>\r\n" +
-					"</s:Body>\r\n" +
-				"</s:Envelope>\r\n";
-
-			HttpClient client = new HttpClient
+			SoapClient client = new SoapClient()
 			{
 				BaseAddress = new Uri(_service.BaseUrl)
 			};
 
-			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, _service.ControlUrl);
-
-			message.Headers.Add("SOAPACTION", _service.Type + "#" + action);
-			message.Content = new StringContent(body, Encoding.UTF8, "text/xml");
-
-			await client.SendAsync(message);
-
-			return true;
+			SoapRequest request = new SoapRequest()
+			{
+				Action = action,
+				ServiceType = _service.Type,
+				Arguments = arguments,
+				ControlUrl = _service.ControlUrl
+			};
+			
+			return (await client.SendAsync(request)).Values;
 		}
 	}
 }
