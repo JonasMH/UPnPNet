@@ -1,4 +1,6 @@
-﻿namespace UPnPNet
+﻿using UPnPNet.Models;
+
+namespace UPnPNet
 {
 	public interface IUPnPServiceDescriptionXmlParser
 	{

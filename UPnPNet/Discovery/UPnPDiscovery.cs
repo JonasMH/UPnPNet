@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using UPnPNet.Discovery.SearchTargets;
+using UPnPNet.Models;
 
 namespace UPnPNet.Discovery
 {

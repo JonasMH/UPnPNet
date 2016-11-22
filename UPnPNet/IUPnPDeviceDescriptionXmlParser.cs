@@ -1,3 +1,5 @@
+using UPnPNet.Models;
+
 namespace UPnPNet
 {
 	public interface IUPnPDeviceDescriptionXmlParser

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using UPnPNet.Models;
 
 namespace UPnPNet
 {

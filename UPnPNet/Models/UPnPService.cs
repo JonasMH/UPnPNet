@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UPnPNet
+namespace UPnPNet.Models
 {
 	public class UPnPService
 	{
@@ -13,5 +13,10 @@ namespace UPnPNet
 		public string ServiceDescriptionUrl { get; set; }
 		public virtual IList<UPnPAction> Actions { get; set; } = new List<UPnPAction>();
 		public virtual IList<UPnPServiceStateVariable> StateVariables { get; set; } = new List<UPnPServiceStateVariable>();
+
+		public override string ToString()
+		{
+			return Id;
+		}
 	}
 }

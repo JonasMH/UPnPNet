@@ -32,7 +32,7 @@ namespace UPnP.Test.Unit.Soap
 			_reponseMessage = Substitute.For<HttpResponseMessage>();
 			_reponseMessage.Content = new ByteArrayContent(Encoding.UTF8.GetBytes("SomeContent"));
 
-			_httpHandler.SendAsync(Arg.Any<Uri>(), Arg.Any<HttpRequestMessage>()).Returns(_reponseMessage);
+			_httpHandler.SendAsync(Arg.Any<HttpRequestMessage>()).Returns(_reponseMessage);
 
 			_soapClient = new SoapClient()
 			{
@@ -46,7 +46,7 @@ namespace UPnP.Test.Unit.Soap
 		public void SendAsync_VerifySoapActionHeader_ShouldIncludeServiceTypeAndAction()
 		{
 			HttpRequestMessage message = null;
-			_httpHandler.SendAsync(Arg.Any<Uri>(), Arg.Do<HttpRequestMessage>(x => message = x));
+			_httpHandler.SendAsync(Arg.Do<HttpRequestMessage>(x => message = x));
 
 			_soapClient.SendAsync(_soapRequest).Wait();
 

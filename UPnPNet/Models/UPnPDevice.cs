@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace UPnPNet
+namespace UPnPNet.Models
 {
 	// ReSharper disable once IconsistentNaming
 	public class UPnPDevice
 	{
-		public string UUID =>
-				UniqueServiceName.Substring(5,
-					UniqueServiceName.IndexOf("::", StringComparison.Ordinal) - 5);
-		
 		public string UniqueServiceName { get; set; }
 		public string Location { get; set; }
 		public string Server { get; set; }
@@ -18,5 +13,16 @@ namespace UPnPNet
 		public virtual IList<UPnPDevice> SubDevices { get; set; } = new List<UPnPDevice>();
 		public virtual IList<UPnPService> Services { get; set; } = new List<UPnPService>();
 		public virtual IDictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
+
+		public override string ToString()
+		{
+			string text;
+			if (!Properties.TryGetValue("friendlyName", out text))
+			{
+				text = Location;
+			}
+
+			return text;
+		}
 	}
 }

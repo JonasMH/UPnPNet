@@ -7,14 +7,20 @@ namespace UPnPNet.Soap
 {
 	public interface IHttpHandler
 	{
-		Task<HttpResponseMessage> SendAsync(Uri baseAddress, HttpRequestMessage message);
+		Task<HttpResponseMessage> SendAsync(HttpRequestMessage message);
 	}
 
 	public class HttpHandler : IHttpHandler
 	{
-		public Task<HttpResponseMessage> SendAsync(Uri baseAddress, HttpRequestMessage message)
+		public Task<HttpResponseMessage> SendAsync(HttpRequestMessage message)
 		{
-			HttpClient client = new HttpClient() {BaseAddress = baseAddress};
+			HttpClientHandler handler = new HttpClientHandler
+			{
+				AutomaticDecompression = System.Net.DecompressionMethods.None
+			};
+			HttpClient client = new HttpClient(handler);
+			client.DefaultRequestHeaders.Clear();
+
 			return client.SendAsync(message);
 		}
 	}
@@ -27,12 +33,12 @@ namespace UPnPNet.Soap
 
 		public async Task<SoapResponse> SendAsync(SoapRequest request)
 		{
-			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, request.ControlUrl);
+			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, new Uri(BaseAddress, request.ControlUrl));
 
 			message.Headers.Add("SOAPACTION", request.ServiceType + "#" + request.Action);
 			message.Content = new StringContent(request.GetBody(), Encoding.UTF8, "text/xml");
 
-			HttpResponseMessage responseMsg = await HttpHandler.SendAsync(BaseAddress, message);
+			HttpResponseMessage responseMsg = await HttpHandler.SendAsync(message);
 
 			byte[] response = await responseMsg.Content.ReadAsByteArrayAsync();
 
