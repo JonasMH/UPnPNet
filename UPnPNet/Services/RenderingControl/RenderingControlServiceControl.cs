@@ -22,7 +22,7 @@ namespace UPnPNet.Services.RenderingControl
 
 			await SendAction("SetVolume", new Dictionary<string, string>
 			{
-				{"InstanceId", instanceId.ToString()},
+				{"InstanceID", instanceId.ToString()},
 				{"Channel", channel.Value},
 				{"DesiredVolume", volume.ToString() }
 			});
@@ -32,7 +32,7 @@ namespace UPnPNet.Services.RenderingControl
 		{
 			IDictionary<string, string> result = await SendAction("SetVolume", new Dictionary<string, string>
 			{
-				{"InstanceId", instanceId.ToString()},
+				{"InstanceID", instanceId.ToString()},
 				{"Channel", channel.Value}
 			});
 

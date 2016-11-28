@@ -9,7 +9,7 @@ namespace UPnP.Test.Unit.Soap
 	public class SoapRequestTests
 	{
 		[Test]
-		public void GetBody_VerifyVersionAndEncoding_ShouldBeV1AndUtf8()
+		public void GetBody_CheckXmlHeader_ShouldNotHaveXmlHeader()
 		{
 			SoapRequest request = new SoapRequest()
 			{
@@ -20,7 +20,7 @@ namespace UPnP.Test.Unit.Soap
 
 			string body = request.GetBody();
 
-			Assert.That(body, Does.StartWith("<?xml version=\"1.0\" encoding=\"utf-8\"?>"));
+			Assert.That(body, Does.Not.StartWith("<?xml"));
 		}
 
 		[Test]

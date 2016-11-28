@@ -17,38 +17,38 @@ namespace UPnPNet.Services.AvTransport
 
 		public Task Stop(int instanceId)
 		{
-			return SendAction("Stop", new Dictionary<string, string> { { "InstanceId", instanceId.ToString() } });
+			return SendAction("Stop", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
 		}
 
 		public Task Play(int instanceId, int speed)
 		{
 			return SendAction("Play", new Dictionary<string, string>
 			{
-				{ "InstanceId", instanceId.ToString()},
+				{ "InstanceID", instanceId.ToString()},
 				{ "Speed", speed.ToString() }
 			});
 		}
 
 		public Task Pause(int instanceId)
 		{
-			return SendAction("Pause", new Dictionary<string, string> { { "InstanceId", instanceId.ToString() } });
+			return SendAction("Pause", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
 		}
 
 		public Task Next(int instanceId)
 		{
-			return SendAction("Next", new Dictionary<string, string> { { "InstanceId", instanceId.ToString() } });
+			return SendAction("Next", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
 		}
 
 		public Task Previous(int instanceId)
 		{
-			return SendAction("Next", new Dictionary<string, string> { { "InstanceId", instanceId.ToString() } });
+			return SendAction("Next", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
 		}
 
 		public Task SetPlayMode(int instanceId, AvTransportPlayMode playMode)
 		{
 			return SendAction("Next", new Dictionary<string, string>
 			{
-				{ "InstanceId", instanceId.ToString() },
+				{ "InstanceID", instanceId.ToString() },
 				{ "NewPlayMode", playMode.Value }
 			});
 		}

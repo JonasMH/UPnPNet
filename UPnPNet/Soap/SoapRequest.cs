@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace UPnPNet.Soap
@@ -19,14 +20,22 @@ namespace UPnPNet.Soap
 			XNamespace serviceNs = ServiceType;
 
 			IList<XElement> xArguments = Arguments.Select(x => new XElement(x.Key, x.Value)).ToList();
-			XElement actionElement = new XElement(serviceNs + Action, new XAttribute(XNamespace.Xmlns + "service", serviceNs), xArguments);
+			XElement actionElement = new XElement(serviceNs + Action, new XAttribute(XNamespace.Xmlns + "u", serviceNs), xArguments);
 			XElement bodyElement = new XElement(ns + "Body", actionElement);
-			XElement envelopeElement = new XElement(ns + "Envelope", new XAttribute(XNamespace.Xmlns + "soap", ns), bodyElement);
+			XElement envelopeElement = new XElement(ns + "Envelope", new XAttribute(XNamespace.Xmlns + "s", ns), bodyElement);
 
 			XDocument document = new XDocument(envelopeElement);
 			Utf8StringWriter writer = new Utf8StringWriter();
 
-			document.Save(writer);
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				OmitXmlDeclaration = true
+			};
+
+			using (XmlWriter xmlWriter = XmlWriter.Create(writer, settings))
+			{
+				document.Save(xmlWriter);
+			}
 
 			return writer.ToString();
 		}
