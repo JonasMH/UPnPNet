@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
 </head>
 <body>
 <div ng-app="myApp" ng-controller="AppPageController">
@@ -79,10 +80,8 @@
 				this.subscribe = function(service) {
 					return $http.post('/api/subscriptions',
 					{
-						publisherPath: service.eventSubUrl,
-						baseAddress: service.baseUrl,
-						timeout: 3600,
-						localUrl: window.location.origin
+						serviceId: service.id,
+						timeout: 3600
 					});
 				}
 
@@ -117,10 +116,10 @@
 				}
 
 				$scope.refreshReceivedValues = function () {
-					SubscriptionService.getNotifies().then(function (data) { $scope.receivedValues = data });
+					SubscriptionService.getNotifies().then(function (data) { $scope.receivedValues = [_.last(data)] });
 				}
 
-				$interval($scope.refreshReceivedValues, 5000);
+				$interval($scope.refreshReceivedValues, 500);
 				AppDeviceService.getDevices().then(function (data) { $scope.devices = data; });
 			});
 	</script>

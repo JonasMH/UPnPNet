@@ -33,6 +33,7 @@ namespace UPnPNet.Gena
 			GenaSubscription subscribtion = new GenaSubscription()
 			{
 				Id = response.Headers.GetValues("SID").FirstOrDefault(),
+				Address = address
 			};
 
 			subscriptions.Add(subscribtion);
@@ -46,16 +47,15 @@ namespace UPnPNet.Gena
 
 			if (sub == null)
 				return;
+			
+			HttpRequestMessage httpRequest = new HttpRequestMessage(new HttpMethod("UNSUBSCRIBE"), sub.Address);
 
-			HttpRequestMessage httpRequest = new HttpRequestMessage
-			{
-				Method = new HttpMethod("SUBSCRIBE"),
-			};
+			httpRequest.Headers.Clear();
 
+			httpRequest.Headers.Add("HOST", sub.Address.Authority);
 			httpRequest.Headers.Add("SID", subscription.Id);
 
 			await HttpHandler.SendAsync(httpRequest);
-
 		}
 
 		public void HandleNotify(string methodVersion, IDictionary<string, string> headers, string body)

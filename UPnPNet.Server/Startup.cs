@@ -38,6 +38,7 @@ namespace UPnPNet.Server
 		{
 			IList<UPnPDevice> devices = new UPnPDiscovery().Search().Result;
 
+			services.AddSingleton<UPnPServiceControlRepository>();
 			services.AddSingleton(new DeviceRepository {Devices = devices });
 			services.AddSingleton<GenaSubscriptionHandler>();
 			services.AddSingleton<NotifyRepository>();

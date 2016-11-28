@@ -1,23 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using UPnPNet.Gena;
 using System.Linq;
+using UPnPNet.Models;
+using UPnPNet.Server.Repositories;
+using UPnPNet.Services;
+using UPnPNet.Services.AvTransport;
+using UPnPNet.Services.RenderingControl;
 
 namespace UPnPNet.Server.Controllers
 {
+	public class UPnPServiceControlRepository
+	{
+		public IList<UPnPServiceControl> ServiceControls = new List<UPnPServiceControl>();
+	}
+
 	[Route("api/[controller]")]
 	public class SubscriptionsController : Controller
 	{
+		private readonly UPnPServiceControlRepository _upnpServiceControlRepository;
 		private readonly GenaSubscriptionHandler _genaSubscriptionHandler;
 		private readonly NotifyRepository _notifyRepository;
+		private readonly DeviceRepository _deviceRepository;
 
-		public SubscriptionsController(GenaSubscriptionHandler genaSubscriptionHandler, NotifyRepository notifyRepository)
+		public SubscriptionsController(GenaSubscriptionHandler genaSubscriptionHandler, NotifyRepository notifyRepository, DeviceRepository deviceRepository, UPnPServiceControlRepository upnpServiceControlRepository)
 		{
 			_genaSubscriptionHandler = genaSubscriptionHandler;
 			_notifyRepository = notifyRepository;
+			_deviceRepository = deviceRepository;
+			_upnpServiceControlRepository = upnpServiceControlRepository;
 		}
 
 		[HttpGet]
@@ -35,19 +47,35 @@ namespace UPnPNet.Server.Controllers
 		[HttpPost]
 		public IActionResult Subscribe([FromBody] GenaSubscriptionRequestDto dto)
 		{
-			GenaSubscriptionRequest request = new GenaSubscriptionRequest()
+			UPnPService service = _deviceRepository.FindService(dto.ServiceId);
+			UPnPServiceControl control = _upnpServiceControlRepository
+				.ServiceControls
+				.FirstOrDefault(x => x.Service == service);
+
+			if (control == null)
 			{
-				BaseAddress = new Uri(dto.BaseAddress),
-				PublisherPath = dto.PublisherPath,
-				Timeout = dto.Timeout,
-				Callback = "http://192.168.5.12:12824/api/subscriptions/notify/"
-			};
-
-			IGenaSubscription sub = _genaSubscriptionHandler.Subscribe(request).Result;
-
-			sub.OnNotify += Sub_OnNotify;
-
-			return Ok(sub);
+				switch (service.Id)
+				{
+					case UPnPServiceIds.AvTransport:
+						control = new AvTransportServiceControl(service);
+						break;
+					case UPnPServiceIds.RenderingControl:
+						control = new RenderingControlServiceControl(service);
+						((RenderingControlServiceControl) control).OnLastChangeEvent += (sender, args) =>
+						{
+							_notifyRepository.Notifies.Add(args.Volumes.ToDictionary(x => x.Key.Value, x => x.Value.ToString()));
+						};
+						break;
+					default:
+						control = new UPnPServiceControl(service);
+						break;
+				}
+				_upnpServiceControlRepository.ServiceControls.Add(control);
+			}
+			
+			control.SubscribeToEvents(_genaSubscriptionHandler, "http://192.168.5.12:12824/api/subscriptions/notify/", 3600).Wait();
+			
+			return Ok();
 		}
 
 		[AcceptVerbs("NOTIFY")]
@@ -55,21 +83,15 @@ namespace UPnPNet.Server.Controllers
 		public IActionResult Notify()
 		{
 			StreamReader reader = new StreamReader(Request.Body);
-			IDictionary<string, string> headers = new Dictionary<string, string>();
-
-			foreach (KeyValuePair<string, StringValues> requestHeader in Request.Headers)
-			{
-				headers.Add(requestHeader.Key, requestHeader.Value.Aggregate((prev, next) => prev + " " + next));
-			}
+			IDictionary<string, string> headers =
+				Request.Headers
+				.ToDictionary(
+					x => x.Key,
+					x => x.Value.Aggregate((prev, next) => prev + " " + next));
 
 			_genaSubscriptionHandler.HandleNotify(Request.Method, headers, reader.ReadToEnd());
 
 			return Ok();
-		}
-
-		private void Sub_OnNotify(object sender, GenaNotifyResponse genaNotifyResponse)
-		{
-			_notifyRepository.Notifies.Add(genaNotifyResponse.Values);
 		}
 	}
 
@@ -85,9 +107,7 @@ namespace UPnPNet.Server.Controllers
 
 	public class GenaSubscriptionRequestDto
 	{
-		public string PublisherPath { get; set; }
-		public string BaseAddress { get; set; }
+		public string ServiceId { get; set; }
 		public int Timeout { get; set; }
-		public string LocalUrl { get; set; }
 	}
 }

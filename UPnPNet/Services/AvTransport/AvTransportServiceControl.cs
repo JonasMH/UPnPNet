@@ -1,34 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UPnPNet.Models;
 
-namespace UPnPNet.Services
+namespace UPnPNet.Services.AvTransport
 {
-	public class AvTransportService : UPnPServiceControl
+	public class AvTransportServiceControl : UPnPLastChangeServiceControl<AvTransportEvent>
 	{
-		public enum PlayMode
+		public AvTransportServiceControl(UPnPService service) : base(service, x => new AvTransportEvent(x))
 		{
-			Normal,
-			RepeatAll,
-			RepeatOne,
-			ShuffleNoRepeat,
-			Shuffle,
-			ShuffleRepeatOne
-		}
-
-		private IReadOnlyDictionary<PlayMode, string> playModeMap = new Dictionary<PlayMode, string>
-		{
-			{PlayMode.Normal, "NORMAL"},
-			{PlayMode.RepeatAll, "REPEAT_ALL" },
-			{PlayMode.RepeatOne, "REPEAT_ONE" },
-			{PlayMode.ShuffleNoRepeat, "SHUFFLE_NOREPEAT"},
-			{PlayMode.Shuffle, "SHUFFLE" },
-			{PlayMode.ShuffleRepeatOne, "SHUFFLE_REPEAT_ONE" }
-		};
-
-		public AvTransportService(UPnPService service) : base(service)
-		{
-
+			if (service.Id != UPnPServiceIds.AvTransport)
+			{
+				throw new ArgumentException("Service does not have correct id, is " + service.Id + ", should be " + UPnPServiceIds.AvTransport);
+			}
 		}
 
 		public Task Stop(int instanceId)
@@ -60,12 +44,12 @@ namespace UPnPNet.Services
 			return SendAction("Next", new Dictionary<string, string> { { "InstanceId", instanceId.ToString() } });
 		}
 
-		public Task SetPlayMode(int instanceId, PlayMode playMode)
+		public Task SetPlayMode(int instanceId, AvTransportPlayMode playMode)
 		{
 			return SendAction("Next", new Dictionary<string, string>
 			{
 				{ "InstanceId", instanceId.ToString() },
-				{ "NewPlayMode", playModeMap[playMode] }
+				{ "NewPlayMode", playMode.Value }
 			});
 		}
 	}
