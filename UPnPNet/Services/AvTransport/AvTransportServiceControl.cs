@@ -41,12 +41,12 @@ namespace UPnPNet.Services.AvTransport
 
 		public Task Previous(int instanceId)
 		{
-			return SendAction("Next", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
+			return SendAction("Previous", new Dictionary<string, string> { { "InstanceID", instanceId.ToString() } });
 		}
 
 		public Task SetPlayMode(int instanceId, AvTransportPlayMode playMode)
 		{
-			return SendAction("Next", new Dictionary<string, string>
+			return SendAction("SetPlayMode", new Dictionary<string, string>
 			{
 				{ "InstanceID", instanceId.ToString() },
 				{ "NewPlayMode", playMode.Value }
