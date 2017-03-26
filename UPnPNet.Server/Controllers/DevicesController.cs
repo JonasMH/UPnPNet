@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using UPnPNet.Server.Repositories;
+﻿using Microsoft.AspNetCore.Mvc;
+using UPnPNet.TestServer.Repositories;
 
-namespace UPnPNet.Server.Controllers
+namespace UPnPNet.TestServer.Controllers
 {
 	[Route("api/[controller]")]
 	public class DevicesController : Controller

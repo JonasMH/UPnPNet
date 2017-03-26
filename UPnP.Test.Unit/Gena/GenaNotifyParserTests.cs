@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
 using UPnPNet.Gena;
+using Xunit;
 
 namespace UPnP.Test.Unit.Gena
 {
-	[TestFixture]
 	public class GenaNotifyParserTests
 	{
-		private GenaNotifyParser _parser = new GenaNotifyParser();
+		private readonly GenaNotifyParser _parser;
 
-		private string _validBodyStringWithSingleValue;
-		private IDictionary<string, string> _validHeaders;
-
-		[SetUp]
-		public void Setup()
+		private readonly string _validBodyStringWithSingleValue;
+		private readonly IDictionary<string, string> _validHeaders;
+		
+		public GenaNotifyParserTests()
 		{
 			_parser = new GenaNotifyParser();
 			_validBodyStringWithSingleValue = "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\"><e:property><LastChange>SomeValue</LastChange></e:property></e:propertyset>";
@@ -25,22 +23,22 @@ namespace UPnP.Test.Unit.Gena
 			};
 		}
 
-		[Test]
+		[Fact]
 		public void HandleNotify_BodyWithSingleValue_ValueShouldBeWrittenToSubscriber()
 		{
 			GenaNotifyResponse result = _parser.Parse(_validHeaders, _validBodyStringWithSingleValue);
 
-			Assert.That(result.Values, Does.Contain(new KeyValuePair<string, string>("LastChange", "SomeValue")));
+			Assert.True(result.Values.Contains(new KeyValuePair<string, string>("LastChange", "SomeValue")));
 		}
 
-		[Test]
+		[Fact]
 		public void HandleNotify_AllHeaders_ShouldParseRelevantHeader()
 		{
 			GenaNotifyResponse result = _parser.Parse(_validHeaders, _validBodyStringWithSingleValue);
 
-			Assert.That(result.SubscriptionId, Is.EqualTo("SomeSID"));
-			Assert.That(result.NTS, Is.EqualTo("SomeNTS"));
-			Assert.That(result.SequencyNumber, Is.EqualTo(2));
+			Assert.Equal("SomeSID", result.SubscriptionId);
+			Assert.Equal("SomeNTS", result.NTS);
+			Assert.Equal(2, result.SequencyNumber);
 		}
 	}
 }

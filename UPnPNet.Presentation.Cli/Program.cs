@@ -1,15 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UPnPNet.Discovery;
 using UPnPNet.Discovery.SearchTargets;
 using UPnPNet.Models;
+using UPnPNet.Server;
+using UPnPNet.Services.AvTransport;
 
 namespace UPnPNet.Presentation.Cli
 {
+	public static class CollectionExtensions
+	{
+		public static void Foreach<T>(this ICollection<T> collection, Action<T> command)
+		{
+			foreach (T var in collection)
+			{
+				command(var);
+			}
+		}
+	}
+
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static void Main()
 		{
 			Console.WriteLine("Searching...");
 			UPnPDiscovery discovery = new UPnPDiscovery { SearchTarget = DiscoverySearchTargetFactory.ServiceTypeSearch("AVTransport", "1") };
@@ -17,11 +31,25 @@ namespace UPnPNet.Presentation.Cli
 			Console.WriteLine("Search done");
 			Console.WriteLine("Devices found: " + devices.Count);
 
+			UPnPServer server = new UPnPServer();
+
 			IList<UPnPDevice> sonosDevices = devices.Where(x => x.Properties["friendlyName"].ToLower().Contains("sonos")).ToList();
 			IList<UPnPService> avServices = sonosDevices.SelectMany(x => x.SubDevices).SelectMany(x => x.Services)
 				.Where(x => x.Type == "urn:schemas-upnp-org:service:AVTransport:1").ToList();
 
-			IList<UPnPServiceControl> speakers = avServices.Select(x => new UPnPServiceControl(x)).ToList();
+			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
+
+
+			server.Start(new IPEndPoint(IPAddress.Parse("192.168.5.12"), 24452));
+
+			speakers.Foreach(x =>
+			{
+				server.SubscribeToControl(x);
+				x.OnLastChangeEvent += (sender, args) =>
+				{
+					Console.WriteLine("SOMETHING: " + args.TransportState);
+				};
+			});
 
 
 			while (true)
@@ -33,10 +61,10 @@ namespace UPnPNet.Presentation.Cli
 					case ConsoleKey.Q:
 						return;
 					case ConsoleKey.A:
-						ForEach(speakers, x => x.SendAction("Play", new Dictionary<string, string>() { { "InstanceID", "0" }, { "Speed", "1" } }).Wait());
+						speakers.Foreach(x => x.SendAction("Play", new Dictionary<string, string>() { { "InstanceID", "0" }, { "Speed", "1" } }).Wait());
 						break;
 					case ConsoleKey.S:
-						ForEach(speakers, x => x.SendAction("Pause", new Dictionary<string, string>() { { "InstanceID", "0" } }).Wait());
+						speakers.Foreach(x => x.SendAction("Pause", new Dictionary<string, string>() { { "InstanceID", "0" } }).Wait());
 						break;
 				}
 			}

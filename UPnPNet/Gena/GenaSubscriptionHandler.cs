@@ -58,7 +58,7 @@ namespace UPnPNet.Gena
 			await HttpHandler.SendAsync(httpRequest);
 		}
 
-		public void HandleNotify(string methodVersion, IDictionary<string, string> headers, string body)
+		public void HandleNotify(IDictionary<string, string> headers, string body)
 		{
 			GenaNotifyResponse response = NotifyParser.Parse(headers, body);
 

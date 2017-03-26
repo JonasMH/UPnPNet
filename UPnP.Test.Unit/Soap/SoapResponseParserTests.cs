@@ -1,22 +1,14 @@
-﻿using NUnit.Framework;
-using UPnPNet.Soap;
+﻿using UPnPNet.Soap;
+using Xunit;
 
 namespace UPnP.Test.Unit.Soap
 {
-	[TestFixture]
 	public class SoapResponseParserTests
 	{
-		private SoapResponseParser _parser;
-
-		[SetUp]
-		public void Setup()
-		{
-			_parser = new SoapResponseParser();
-		}
-
-		[Test]
+		[Fact]
 		public void ParseResponse_IncludeOneValue_ValuePresent()
 		{
+			SoapResponseParser parser = new SoapResponseParser();
 			const string xml = "<?xml version=\"1.0\"?>" +
 							   "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope/\" soap:encodingStyle=\"http://www.w3.org/2003/05/soap-encoding\">" +
 							   "<soap:Body>" +
@@ -27,9 +19,9 @@ namespace UPnP.Test.Unit.Soap
 							   "</soap:Envelope>";
 
 
-			SoapResponse response = _parser.ParseResponse(xml);
+			SoapResponse response = parser.ParseResponse(xml);
 
-			Assert.That(response.Values, Has.Count.EqualTo(1));
+			Assert.Equal(1, response.Values.Count);
 		}
 	}
 }

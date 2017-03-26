@@ -2,7 +2,7 @@
 using System.Linq;
 using UPnPNet.Models;
 
-namespace UPnPNet.Server.Repositories
+namespace UPnPNet.TestServer.Repositories
 {
 	public class DeviceRepository
 	{

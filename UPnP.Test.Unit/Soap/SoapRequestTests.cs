@@ -1,14 +1,13 @@
 ﻿
 using System.Collections.Generic;
-using NUnit.Framework;
 using UPnPNet.Soap;
+using Xunit;
 
 namespace UPnP.Test.Unit.Soap
 {
-	[TestFixture]
 	public class SoapRequestTests
 	{
-		[Test]
+		[Fact]
 		public void GetBody_CheckXmlHeader_ShouldNotHaveXmlHeader()
 		{
 			SoapRequest request = new SoapRequest()
@@ -20,10 +19,10 @@ namespace UPnP.Test.Unit.Soap
 
 			string body = request.GetBody();
 
-			Assert.That(body, Does.Not.StartWith("<?xml"));
+			Assert.True(!body.StartsWith("<?xml"));
 		}
 
-		[Test]
+		[Fact]
 		public void GetBody_SingleArgument_ArgumentShouldBePresentInXml()
 		{
 			SoapRequest request = new SoapRequest
@@ -36,7 +35,7 @@ namespace UPnP.Test.Unit.Soap
 
 			string body = request.GetBody();
 
-			Assert.That(body, Does.Contain("<SomeArgument>SomeValue</SomeArgument>"));
+			Assert.True(body.Contains("<SomeArgument>SomeValue</SomeArgument>"));
 		}
 	}
 }

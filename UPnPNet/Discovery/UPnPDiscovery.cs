@@ -53,7 +53,16 @@ namespace UPnPNet.Discovery
 			device.Targets.Add(response["ST"]);
 		}
 
+		public async Task<IList<UPnPDevice>> DeepSearch()
+		{
+			return await SearchInternal(true);
+		}
 		public async Task<IList<UPnPDevice>> Search()
+		{
+			return await SearchInternal(false);
+		}
+
+		private async Task<IList<UPnPDevice>> SearchInternal(bool loadServiceDescription)
 		{
 			IList<UPnPDevice> foundDevices = new List<UPnPDevice>();
 			UPnPDeviceLoader deviceLoader = new UPnPDeviceLoader();
@@ -65,7 +74,12 @@ namespace UPnPNet.Discovery
 
 
 			Task deviceTask = taskFactory.StartNew(() => deviceLoader.LoadDevices(new[] { basicDevices }, loadedDevices));
-			Task serviceTask = taskFactory.StartNew(() => serviceLoader.LoadServices(new[] { loadedDevices }, loadedDevicesWithServices));
+			Task serviceTask = null;
+
+			if (loadServiceDescription)
+			{
+				serviceTask = taskFactory.StartNew(() => serviceLoader.LoadServices(new[] { loadedDevices }, loadedDevicesWithServices));
+			}
 
 
 			string request = $"M-SEARCH * HTTP/1.1\r\nHOST: {MulticastAddress}:{MulticastPort}\r\nMAN:\"ssdp:discover\"\r\nST: {SearchTarget.Target}\r\nMX: {WaitTimeInSeconds}\r\n\r\n";
@@ -108,9 +122,14 @@ namespace UPnPNet.Discovery
 			basicDevices.CompleteAdding();
 
 			await deviceTask;
-			await serviceTask;
 
-			return loadedDevicesWithServices.ToList();
+			if (serviceTask != null)
+			{
+				await serviceTask;
+				return loadedDevicesWithServices.ToList();
+			}
+
+			return loadedDevices.ToList();
 		}
 
 		private UPnPDevice CreateDeviceFromResponse(IDictionary<string, string> response)

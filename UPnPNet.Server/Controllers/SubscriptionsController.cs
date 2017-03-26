@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using UPnPNet.Gena;
-using System.Linq;
 using UPnPNet.Models;
-using UPnPNet.Server.Repositories;
 using UPnPNet.Services;
 using UPnPNet.Services.AvTransport;
 using UPnPNet.Services.RenderingControl;
+using UPnPNet.TestServer.Repositories;
 
-namespace UPnPNet.Server.Controllers
+namespace UPnPNet.TestServer.Controllers
 {
 	public class UPnPServiceControlRepository
 	{
@@ -73,7 +73,7 @@ namespace UPnPNet.Server.Controllers
 				_upnpServiceControlRepository.ServiceControls.Add(control);
 			}
 			
-			control.SubscribeToEvents(_genaSubscriptionHandler, "http://192.168.5.12:12824/api/subscriptions/notify/", 3600).Wait();
+			control.SubscribeToEvents(_genaSubscriptionHandler, "http://localhost:12823/api/subscriptions/notify/", 3600).Wait();
 			
 			return Ok();
 		}
@@ -89,7 +89,7 @@ namespace UPnPNet.Server.Controllers
 					x => x.Key,
 					x => x.Value.Aggregate((prev, next) => prev + " " + next));
 
-			_genaSubscriptionHandler.HandleNotify(Request.Method, headers, reader.ReadToEnd());
+			_genaSubscriptionHandler.HandleNotify(headers, reader.ReadToEnd());
 
 			return Ok();
 		}

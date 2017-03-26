@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UPnPNet", "UPnPNet\UPnPNet.xproj", "{2307F29B-DB19-4A87-9D11-F615837B1317}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UPnPNet", "UPnPNet\UPnPNet.csproj", "{2307F29B-DB19-4A87-9D11-F615837B1317}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UPnPNet.Test.Unit", "UPnP.Test.Unit\UPnPNet.Test.Unit.xproj", "{EFA427C3-5A49-4725-A67E-CFB394930E60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UPnP.Test.Unit", "UPnP.Test.Unit\UPnP.Test.Unit.csproj", "{EFA427C3-5A49-4725-A67E-CFB394930E60}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UPnPNet.Presentation.Cli", "UPnPNet.Presentation.Cli\UPnPNet.Presentation.Cli.xproj", "{6DCF3D00-26FA-4880-A410-5B8EF704FC07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UPnPNet.Presentation.Cli", "UPnPNet.Presentation.Cli\UPnPNet.Presentation.Cli.csproj", "{6DCF3D00-26FA-4880-A410-5B8EF704FC07}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UPnPNet.Server", "UPnPNet.Server\UPnPNet.Server.xproj", "{DD89D48F-78FF-4AD6-A12F-2A38701DDEBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UPnPNet.Server", "UPnPNet.Server\UPnPNet.Server.csproj", "{DD89D48F-78FF-4AD6-A12F-2A38701DDEBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

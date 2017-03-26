@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using UPnPNet.Discovery;
 using UPnPNet.Gena;
 using UPnPNet.Models;
-using UPnPNet.Server.Controllers;
-using UPnPNet.Server.Repositories;
+using UPnPNet.TestServer.Controllers;
+using UPnPNet.TestServer.Repositories;
 
-namespace UPnPNet.Server
+namespace UPnPNet.TestServer
 {
 	public class Startup
 	{

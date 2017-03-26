@@ -1,26 +1,19 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
 using UPnPNet.Services;
 using UPnPNet.Services.RenderingControl;
+using Xunit;
 
 namespace UPnP.Test.Unit.Services.RenderingControl
 {
-	[TestFixture]
 	public class RenderingControlEventTests
 	{
-		public IList<UPnPLastChangeValue> _testData;
-		public RenderingControlEvent _controlEvent;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testData = new List<UPnPLastChangeValue>();
-		}
-
-		[Test]
+		[Fact]
 		public void Volumes_MultipleVolumes_ShouldParseThemAll()
 		{
-			_testData.Add(new UPnPLastChangeValue
+		IList<UPnPLastChangeValue> _testData = new List<UPnPLastChangeValue>();
+			RenderingControlEvent _controlEvent;
+
+		_testData.Add(new UPnPLastChangeValue
 			{
 				Key = "Volume",
 				Attributes = new Dictionary<string, string>
@@ -39,13 +32,13 @@ namespace UPnP.Test.Unit.Services.RenderingControl
 				}
 			});
 
-			Assert.That(RenderingControlChannel.GetByValue("Master"), Is.Not.Null);
+			Assert.NotNull(RenderingControlChannel.GetByValue("Master"));
 
 			_controlEvent = new RenderingControlEvent(_testData);
 
-			Assert.That(_controlEvent.Volumes, Has.Count.EqualTo(2));
-			Assert.That(_controlEvent.Volumes[RenderingControlChannel.Master], Is.EqualTo(17));
-			Assert.That(_controlEvent.Volumes[RenderingControlChannel.LeftFront], Is.EqualTo(100));
+			Assert.Equal(2, _controlEvent.Volumes.Count);
+			Assert.Equal(17, _controlEvent.Volumes[RenderingControlChannel.Master]);
+			Assert.Equal(100, _controlEvent.Volumes[RenderingControlChannel.LeftFront]);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
-namespace UPnPNet.Server
+namespace UPnPNet.TestServer
 {
 	public class Program
 	{
