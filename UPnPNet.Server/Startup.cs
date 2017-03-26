@@ -50,9 +50,7 @@ namespace UPnPNet.TestServer
 			loggerFactory.AddConsole(Configuration.GetSection("Logging"));
 			loggerFactory.AddDebug();
 
-			app.UseApplicationInsightsRequestTelemetry();
 
-			app.UseApplicationInsightsExceptionTelemetry();
 			app.UseStaticFiles();
 			app.UseMvc();
 		}
