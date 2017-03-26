@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using UPnPNet.Gena;
 using System.Threading;
 using Microsoft.Net.Http.Server;
 using UPnPNet.Services;
 using System.Linq;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using System.Net.Sockets;
 
 namespace UPnPNet.Server
 {
@@ -18,8 +16,8 @@ namespace UPnPNet.Server
 	{
 		public GenaSubscriptionHandler Handler { get; }
 		public string Url { get; private set; }
-		private WebListener _listener;
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private TcpListener _listener;
 
 		public UPnPServer()
 		{
@@ -33,26 +31,18 @@ namespace UPnPNet.Server
 
 		public void Start(IPEndPoint endpoint)
 		{
-			if (_listener != null)
-				return;
+			Url = $"http://{endpoint.Address}:{endpoint.Port}";
 
-			Url = $"http://{endpoint.Address}:{endpoint.Port}/";
-
-			WebListenerSettings settings = new WebListenerSettings();
-			settings.UrlPrefixes.Add(Url);
-			_listener = new WebListener(settings);
+			_listener = new TcpListener(endpoint);
 			_listener.Start();
-
-			Task.Factory.StartNew(Listen, _cancellationTokenSource.Token);
+			
+			
+			Task.Factory.StartNew(() => Listen(_listener), _cancellationTokenSource.Token);
 		}
 
 		public void Stop()
 		{
-			if (_listener == null)
-				return;
-
 			_cancellationTokenSource.Cancel();
-			_listener.Dispose();
 		}
 
 		public async void SubscribeToControl<T>(UPnPLastChangeServiceControl<T> control)
@@ -60,30 +50,47 @@ namespace UPnPNet.Server
 			await control.SubscribeToEvents(Handler, Url, 3600);
 		}
 
-		private async void Listen()
+		private async void Listen(TcpListener listener)
 		{
 			while (true)
 			{
 				try
 				{
 					Console.WriteLine("LISTENING");
-					
-
-					using (RequestContext client = await _listener.AcceptAsync())
+					using (TcpClient client = await listener.AcceptTcpClientAsync())
 					{
-						if (!client.Request.Method.ToLower().StartsWith("notify"))
+						NetworkStream stream = client.GetStream();
+
+						StreamReader reader = new StreamReader(stream);
+						StreamWriter writer = new StreamWriter(stream) { AutoFlush = true };
+
+						string request = reader.ReadToEnd();
+						string response = "HTTP/1.1 200 Ok\r\nConnection: close\r\n\r\n";
+
+						string[] lines = request.Split(new [] { "\r\n" }, StringSplitOptions.None);
+						string body = "";
+						IDictionary<string, string> headers = new Dictionary<string, string>();
+
+
+						for(int i = 1; i < lines.Length; i++)
 						{
-							client.Response.StatusCode = 400;
-							continue;
+							if (string.IsNullOrEmpty(lines[i])) //Assume we hit body
+							{
+								for (int x = i; x < lines.Length; x++)
+								{
+									body += lines[x];
+								}
+								break;
+							}
+
+							int colonIndex = lines[i].IndexOf(":");
+							headers.Add(lines[i].Substring(0, colonIndex), lines[i].Substring(colonIndex + 2));
 						}
 
-						client.Response.StatusCode = 200;
 
-						string body = await new StreamReader(client.Request.Body).ReadToEndAsync();
-
-						Handler.HandleNotify(
-							client.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-							body);
+						writer.Write(response);
+						
+						Handler.HandleNotify(headers, body);
 					}
 				}
 				catch (Exception e)
@@ -137,19 +144,7 @@ namespace UPnPNet.Server
 			return toReturn;
 		}
 	}
-
-	public class Startup : IStartup
-	{
-		public IServiceProvider ConfigureServices(IServiceCollection services)
-		{
-			return services.BuildServiceProvider();
-		}
-
-		public void Configure(IApplicationBuilder app)
-		{
-		}
-	}
-
+	
 	public class HttpRequest
 	{
 		public string Body { get; set; }

@@ -40,7 +40,7 @@ namespace UPnPNet.Presentation.Cli
 			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
 
 			
-			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24453 + new Random().Next(0, 100)));
+			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24453));
 
 			speakers.Foreach(x =>
 			{
