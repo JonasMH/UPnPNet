@@ -4,13 +4,13 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using UPnPNet.Gena;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Microsoft.Net.Http.Server;
 using UPnPNet.Services;
 using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace UPnPNet.Server
 {
@@ -42,15 +42,6 @@ namespace UPnPNet.Server
 			settings.UrlPrefixes.Add(Url);
 			_listener = new WebListener(settings);
 			_listener.Start();
-
-			var builder = new WebHostBuilder()
-				.UseContentRoot(Directory.GetCurrentDirectory())
-				.UseUrls(Url)
-				.UseWebListener(options =>
-				{
-				});
-
-			builder.Build().Run();
 
 			Task.Factory.StartNew(Listen, _cancellationTokenSource.Token);
 		}
@@ -144,6 +135,18 @@ namespace UPnPNet.Server
 			toReturn.Body = WebUtility.HtmlDecode(toReturn.Body);
 
 			return toReturn;
+		}
+	}
+
+	public class Startup : IStartup
+	{
+		public IServiceProvider ConfigureServices(IServiceCollection services)
+		{
+			return services.BuildServiceProvider();
+		}
+
+		public void Configure(IApplicationBuilder app)
+		{
 		}
 	}
 

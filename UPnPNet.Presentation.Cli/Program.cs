@@ -39,8 +39,8 @@ namespace UPnPNet.Presentation.Cli
 
 			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
 
-
-			server.Start(new IPEndPoint(IPAddress.Parse("192.168.5.12"), 24452));
+			
+			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24453 + new Random().Next(0, 100)));
 
 			speakers.Foreach(x =>
 			{
