@@ -7,9 +7,9 @@
 		<PackageReference Include="Microsoft.Net.Http.Server" Version="1.1.1" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<PackageReference Include="System.Net.Requests" Version="4.3.0" />
-		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.0.1" />
+		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 		<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.0-*" />
-		<PackageReference Include="Microsoft.AspNetCore.Server.WebListener" Version="1.1.0-*" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Server.WebListener" Version="1.1.1" />
 	</ItemGroup>
 </Project>

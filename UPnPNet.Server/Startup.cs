@@ -21,30 +21,24 @@ namespace UPnPNet.TestServer
 				.AddJsonFile("appsettings.json", true, true)
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", true);
 
-			if (env.IsEnvironment("Development"))
-			{
-				builder.AddApplicationInsightsSettings(true);
-			}
-			
 			builder.AddEnvironmentVariables();
 			Configuration = builder.Build();
 		}
 
 		public IConfigurationRoot Configuration { get; }
-		
+
 		public void ConfigureServices(IServiceCollection services)
 		{
 			IList<UPnPDevice> devices = new UPnPDiscovery().Search().Result;
 
 			services.AddSingleton<UPnPServiceControlRepository>();
-			services.AddSingleton(new DeviceRepository {Devices = devices });
+			services.AddSingleton(new DeviceRepository { Devices = devices });
 			services.AddSingleton<GenaSubscriptionHandler>();
 			services.AddSingleton<NotifyRepository>();
 
-			services.AddApplicationInsightsTelemetry(Configuration);
 			services.AddMvc().AddXmlSerializerFormatters();
 		}
-		
+
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
 			loggerFactory.AddConsole(Configuration.GetSection("Logging"));
