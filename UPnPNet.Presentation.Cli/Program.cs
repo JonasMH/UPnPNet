@@ -5,7 +5,6 @@ using System.Net;
 using UPnPNet.Discovery;
 using UPnPNet.Discovery.SearchTargets;
 using UPnPNet.Models;
-using UPnPNet.Server;
 using UPnPNet.Services.AvTransport;
 
 namespace UPnPNet.Presentation.Cli
@@ -24,7 +23,7 @@ namespace UPnPNet.Presentation.Cli
 	public class Program
 	{
 		public static void Main()
-		{
+	{
 			Console.WriteLine("Searching...");
 			UPnPDiscovery discovery = new UPnPDiscovery { SearchTarget = DiscoverySearchTargetFactory.ServiceTypeSearch("AVTransport", "1") };
 			IList<UPnPDevice> devices = discovery.Search().Result;
@@ -34,13 +33,16 @@ namespace UPnPNet.Presentation.Cli
 			UPnPServer server = new UPnPServer();
 
 			IList<UPnPDevice> sonosDevices = devices.Where(x => x.Properties["friendlyName"].ToLower().Contains("sonos")).ToList();
-			IList<UPnPService> avServices = sonosDevices.SelectMany(x => x.SubDevices).SelectMany(x => x.Services)
+
+			IList<UPnPService> avServices = sonosDevices
+				.SelectMany(x => x.SubDevices)
+				.SelectMany(x => x.Services)
 				.Where(x => x.Type == "urn:schemas-upnp-org:service:AVTransport:1").ToList();
 
 			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
 
 			
-			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24453));
+			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24458));
 
 			speakers.Foreach(x =>
 			{
@@ -67,14 +69,6 @@ namespace UPnPNet.Presentation.Cli
 						speakers.Foreach(x => x.SendAction("Pause", new Dictionary<string, string>() { { "InstanceID", "0" } }).Wait());
 						break;
 				}
-			}
-		}
-
-		private static void ForEach<T>(IList<T> list, Action<T> command)
-		{
-			foreach (T x1 in list)
-			{
-				command(x1);
 			}
 		}
 

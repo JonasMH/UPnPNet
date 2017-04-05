@@ -68,7 +68,7 @@ namespace UPnPNet.Gena
 
 			foreach (GenaSubscription genaSubscription in subs)
 			{
-				genaSubscription.FireOnNotify(response);
+				genaSubscription?.FireOnNotify(response);
 			}
 		}
 	}
