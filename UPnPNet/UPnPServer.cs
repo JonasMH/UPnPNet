@@ -27,14 +27,14 @@ namespace UPnPNet
 			Handler = handler;
 		}
 
-		public void Start(IPEndPoint endpoint)
+		public void Start(string url)
 		{
-			Url = $"http://{endpoint.Address}:{endpoint.Port}/notify";
+			Url = url +  $"/notify";
 			
 
-			var host = new WebHostBuilder()
+			IWebHost host = new WebHostBuilder()
 				.UseKestrel()
-				.UseUrls($"http://{endpoint.Address}:{endpoint.Port}")
+				.UseUrls(url)
 				.Configure(app =>
 				{
 					app.Run(handler =>
