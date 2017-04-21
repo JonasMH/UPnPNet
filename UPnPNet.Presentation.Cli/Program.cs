@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UPnPNet.Discovery;
 using UPnPNet.Discovery.SearchTargets;
 using UPnPNet.Models;
@@ -22,16 +23,17 @@ namespace UPnPNet.Presentation.Cli
 	public class Program
 	{
 		public static void Main()
-	{
-			Console.WriteLine("Searching...");
-			UPnPDiscovery discovery = new UPnPDiscovery { SearchTarget = DiscoverySearchTargetFactory.ServiceTypeSearch("AVTransport", "1") };
+		{
+			UPnPDiscovery discovery = new UPnPDiscovery
+			{
+				SearchTarget = DiscoverySearchTargetFactory.ServiceTypeSearch("AVTransport", "1")
+			};
 			IList<UPnPDevice> devices = discovery.Search().Result;
-			Console.WriteLine("Search done");
-			Console.WriteLine("Devices found: " + devices.Count);
 
 			UPnPServer server = new UPnPServer();
 
-			IList<UPnPDevice> sonosDevices = devices.Where(x => x.Properties["friendlyName"].ToLower().Contains("sonos")).ToList();
+			IList<UPnPDevice> sonosDevices =
+				devices.Where(x => x.Properties["friendlyName"].ToLower().Contains("sonos")).ToList();
 
 			IList<UPnPService> avServices = sonosDevices
 				.SelectMany(x => x.SubDevices)
@@ -40,16 +42,13 @@ namespace UPnPNet.Presentation.Cli
 
 			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
 
-			
-			server.Start("*:24458");
+
+			server.Start(24458);
 
 			speakers.Foreach(x =>
 			{
-				server.SubscribeToControl(x, "172.16.1.30:24458");
-				x.OnLastChangeEvent += (sender, args) =>
-				{
-					Console.WriteLine("SOMETHING: " + args.TransportState);
-				};
+				server.SubscribeToControl(x);
+				x.OnLastChangeEvent += (sender, args) => { Console.WriteLine("SOMETHING: " + args.TransportState); };
 			});
 
 
@@ -62,10 +61,11 @@ namespace UPnPNet.Presentation.Cli
 					case ConsoleKey.Q:
 						return;
 					case ConsoleKey.A:
-						speakers.Foreach(x => x.SendAction("Play", new Dictionary<string, string>() { { "InstanceID", "0" }, { "Speed", "1" } }).Wait());
+						speakers.Foreach(
+							x => x.SendAction("Play", new Dictionary<string, string>() {{"InstanceID", "0"}, {"Speed", "1"}}).Wait());
 						break;
 					case ConsoleKey.S:
-						speakers.Foreach(x => x.SendAction("Pause", new Dictionary<string, string>() { { "InstanceID", "0" } }).Wait());
+						speakers.Foreach(x => x.SendAction("Pause", new Dictionary<string, string>() {{"InstanceID", "0"}}).Wait());
 						break;
 				}
 			}

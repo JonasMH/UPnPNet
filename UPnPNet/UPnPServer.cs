@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using UPnPNet.Extensions;
 using UPnPNet.Gena;
 using UPnPNet.Services;
 
@@ -14,6 +15,7 @@ namespace UPnPNet
 	{
 		public GenaSubscriptionHandler Handler { get; }
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		public int Port { get; private set; }
 
 		public UPnPServer()
 		{
@@ -25,11 +27,12 @@ namespace UPnPNet
 			Handler = handler;
 		}
 
-		public void Start(string hostingUrl)
+		public void Start(int port, string host = "*")
 		{
-			IWebHost host = new WebHostBuilder()
+			Port = port;
+			IWebHost webHost = new WebHostBuilder()
 				.UseKestrel()
-				.UseUrls(hostingUrl)
+				.UseUrls("http://" + host + ":" + port)
 				.Configure(app =>
 				{
 					app.Run(handler =>
@@ -49,7 +52,7 @@ namespace UPnPNet
 				})
 				.Build();
 
-			Task.Run(() => host.Run(_cancellationTokenSource.Token));
+			Task.Run(() => webHost.Run(_cancellationTokenSource.Token));
 		}
 
 		public void Stop()
@@ -57,9 +60,9 @@ namespace UPnPNet
 			_cancellationTokenSource.Cancel();
 		}
 
-		public async void SubscribeToControl<T>(UPnPLastChangeServiceControl<T> control, string localUrl)
+		public async void SubscribeToControl<T>(UPnPLastChangeServiceControl<T> control)
 		{
-			await control.SubscribeToEvents(Handler, localUrl, 3600);
+			await control.SubscribeToEvents(Handler, "http://" + control.Service.GetInterfaceToHost() + ":" + Port, 3600);
 		}
 	}
 }

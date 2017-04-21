@@ -107,9 +107,12 @@ namespace UPnPNet.Discovery
 				foreach (UdpClient udpClient in clients.Where(x => x.Available > 0))
 				{
 					UdpReceiveResult received = await udpClient.ReceiveAsync();
-
+					
 					HandleResponse(received.Buffer, foundDevices, device =>
 					{
+						IPEndPoint endpoint = udpClient.Client.LocalEndPoint as IPEndPoint;
+						
+						device.InterfaceToHost = endpoint?.Address.ToString();
 						foundDevices.Add(device);
 						basicDevices.Add(device);
 					});

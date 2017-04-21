@@ -20,8 +20,19 @@ namespace UPnPNet
 			IEnumerable<XElement> xElements = xml as IList<XElement> ?? xml.ToList();
 
 			device.Services = ParseServices(xElements, baseUri);
+
+			foreach (UPnPService service in device.Services)
+			{
+				service.ParentDevice = device;
+			}
+
 			device.Properties = ParseProperties(xElements);
 			device.SubDevices = LoadSubDevices(xElements, device.Location);
+			
+			foreach (UPnPDevice service in device.SubDevices)
+			{
+				service.ParentDevice = device;
+			}
 
 			return device;
 		}
