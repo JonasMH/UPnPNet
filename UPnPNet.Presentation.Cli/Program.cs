@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using UPnPNet.Discovery;
 using UPnPNet.Discovery.SearchTargets;
 using UPnPNet.Models;
@@ -42,11 +41,11 @@ namespace UPnPNet.Presentation.Cli
 			IList<AvTransportServiceControl> speakers = avServices.Select(x => new AvTransportServiceControl(x)).ToList();
 
 			
-			server.Start(new IPEndPoint(IPAddress.Parse("172.16.1.30"), 24458));
+			server.Start("*:24458");
 
 			speakers.Foreach(x =>
 			{
-				server.SubscribeToControl(x);
+				server.SubscribeToControl(x, "172.16.1.30:24458");
 				x.OnLastChangeEvent += (sender, args) =>
 				{
 					Console.WriteLine("SOMETHING: " + args.TransportState);

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +13,6 @@ namespace UPnPNet
 	public class UPnPServer
 	{
 		public GenaSubscriptionHandler Handler { get; }
-		public string Url { get; private set; }
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
 		public UPnPServer()
@@ -27,14 +25,11 @@ namespace UPnPNet
 			Handler = handler;
 		}
 
-		public void Start(string url)
+		public void Start(string hostingUrl)
 		{
-			Url = url +  $"/notify";
-			
-
 			IWebHost host = new WebHostBuilder()
 				.UseKestrel()
-				.UseUrls(url)
+				.UseUrls(hostingUrl)
 				.Configure(app =>
 				{
 					app.Run(handler =>
@@ -50,6 +45,7 @@ namespace UPnPNet
 						handler.Response.StatusCode = 200;
 						return Task.FromResult(0);
 					});
+
 				})
 				.Build();
 
@@ -61,9 +57,9 @@ namespace UPnPNet
 			_cancellationTokenSource.Cancel();
 		}
 
-		public async void SubscribeToControl<T>(UPnPLastChangeServiceControl<T> control)
+		public async void SubscribeToControl<T>(UPnPLastChangeServiceControl<T> control, string localUrl)
 		{
-			await control.SubscribeToEvents(Handler, Url, 3600);
+			await control.SubscribeToEvents(Handler, localUrl, 3600);
 		}
 	}
 }
